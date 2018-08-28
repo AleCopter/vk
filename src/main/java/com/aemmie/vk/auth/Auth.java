@@ -1,5 +1,7 @@
 package com.aemmie.vk.auth;
 
+import com.aemmie.vk.core.VKApiRequest;
+
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,12 +14,17 @@ import static java.lang.System.exit;
 public class Auth {
     private static String accessToken;
     private static File TOKEN = new File("my.token");
+    private static String ID;
 
     public static void init() {
         if (!TOKEN.exists()) {
             updateToken();
         }
         readTokenFromFile();
+        ID = new VKApiRequest("utils.resolveScreenName")
+                .param("screen_name", new VKApiRequest("account.getProfileInfo").run().get("screen_name").getAsString())
+                .run()
+                .get("object_id").getAsString();
     }
 
     public static String getAccessToken() {
@@ -29,7 +36,7 @@ public class Auth {
     }
 
     public static String getMyId() {
-        return "118892922";
+        return ID;
     }
 
     public static void updateToken() {

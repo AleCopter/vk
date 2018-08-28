@@ -58,6 +58,7 @@ public class VKApiRequest {
             long currentTime = System.currentTimeMillis();
             while (currentTime - lastTime < 400) {
                 Thread.sleep(50);
+                currentTime = System.currentTimeMillis();
             }
             lastTime = currentTime;
 
