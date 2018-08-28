@@ -55,6 +55,8 @@ public class VKApiRequest {
 
     public JsonObject run() {
         try {
+            //restriction of 3 requests per second
+            //TODO: make request counter
             long currentTime = System.currentTimeMillis();
             while (currentTime - lastTime < 400) {
                 Thread.sleep(50);
@@ -71,7 +73,6 @@ public class VKApiRequest {
             for (String key : params.keySet()) {
                 if (!key.equals("method")) urlParameters.add(new BasicNameValuePair(key, params.get(key)));
             }
-            //if (!params.containsKey("sig")) urlParameters.add(new BasicNameValuePair("sig", getSig()));
             request.setEntity(new UrlEncodedFormEntity(urlParameters));
             HttpResponse response = client.execute(request);
 
@@ -83,12 +84,4 @@ public class VKApiRequest {
         }
     }
 
-//    public String getSig() {
-//        String src = "/method/" + params.get("method") + "?";
-//        ArrayList<String> parts = new ArrayList<>();
-//        for (String key : params.keySet()) {
-//            if (!key.equals("method")) parts.add(key + '=' +params.get(key));
-//        }
-//        return Sig.md5(src + String.join("&", parts) + Auth.AUTH_SECRET);
-//    }
 }

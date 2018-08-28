@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
+import java.awt.event.*;
+import java.util.ArrayList;
 
 import static java.lang.System.exit;
 
@@ -27,9 +27,8 @@ public class App {
     private static JPanel messagePanel = new JPanel();
     private static JPanel musicPanel = new JPanel();
 
-    private static JToggleButton newsButton;
-    private static JToggleButton messagesButton;
-    private static JToggleButton musicButton;
+    private static ArrayList<JComponent> tabsList = new ArrayList<>();
+    private static ArrayList<JToggleButton> tabButtonsList = new ArrayList<>();
 
     private static JButton playButton;
 
@@ -49,12 +48,13 @@ public class App {
         listPane.setBackground(Color.DARK_GRAY);
         listPane.setLayout(new BoxLayout(listPane, BoxLayout.Y_AXIS));
 
-        newsPanel.getVerticalScrollBar().setUnitIncrement(32);
+        newsPanel.getVerticalScrollBar().setUnitIncrement(20);
         newsPanel.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 JScrollBar bar = (JScrollBar) e.getSource();
-                if (bar.getMaximum() > 500 && 1.0 * bar.getValue()/bar.getMaximum() > 0.9 && NewsApi.ready) {
+
+                if (bar.getMaximum() > 500 && (1.0 * bar.getValue() / bar.getMaximum() > 0.9 || bar.getMaximum() - bar.getValue() < 1000) && NewsApi.ready) {
                     NewsApi.updateNews(15);
                 }
             }
@@ -62,21 +62,7 @@ public class App {
         newsPanel.setBorder(null);
         listPane.setBorder(null);
 
-        NewsApi.updateNews(70);
-        //NewsApi.updateNews(20);
-
-        //Player.setAudioList(Auth.getMyId());
-        //Player.toggleRandom();
-        //Player.playFirst();
-        //Player.test();
-//        button1.setText(Player.getCurrentAudio().toString());
-//        button1.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                Player.skip();
-//                button1.setText(Player.getCurrentAudio().toString());
-//            }
-//        });
+        NewsApi.updateNews(30);
     }
 
     private static void frameInit() {
@@ -88,7 +74,7 @@ public class App {
         mainPanel.add(newsPanel);
 
 
-        frame.setIconImage( new ImageIcon("icons/vk2.png").getImage());
+        frame.setIconImage(new ImageIcon("icons/vk2.png").getImage());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("VK client");
         frame.setUndecorated(true);
@@ -105,42 +91,9 @@ public class App {
         titlebar.setAlignmentY(Component.TOP_ALIGNMENT);
         titlebar.setBorder(new LineBorder(Color.BLACK, 1));
 
-        newsButton = new JToggleButton(getIcon("icons/news.png", BUTTON_SIZE));
-        newsButton.setFocusable(false);
-        newsButton.setSelected(true);
-        newsButton.addActionListener(e -> {
-            newsButton.setSelected(true);
-            messagesButton.setSelected(false);
-            musicButton.setSelected(false);
-            mainPanel.remove(1);
-            mainPanel.add(newsPanel);
-            mainPanel.updateUI();
-        });
-        titlebar.add(newsButton);
-
-        messagesButton = new JToggleButton(getIcon("icons/messages.png", BUTTON_SIZE));
-        messagesButton.setFocusable(false);
-        messagesButton.addActionListener(e -> {
-            newsButton.setSelected(false);
-            messagesButton.setSelected(true);
-            musicButton.setSelected(false);
-            mainPanel.remove(1);
-            mainPanel.add(messagePanel);
-            mainPanel.updateUI();
-        });
-        titlebar.add(messagesButton);
-
-        musicButton = new JToggleButton(getIcon("icons/music.png", BUTTON_SIZE));
-        musicButton.setFocusable(false);
-        musicButton.addActionListener(e -> {
-            newsButton.setSelected(false);
-            messagesButton.setSelected(false);
-            musicButton.setSelected(true);
-            mainPanel.remove(1);
-            mainPanel.add(musicPanel);
-            mainPanel.updateUI();
-        });
-        titlebar.add(musicButton);
+        createNewTab("news.png", newsPanel);
+        createNewTab("messages.png", messagePanel);
+        createNewTab("music.png", musicPanel);
 
         titlebar.add(Box.createRigidArea(new Dimension(450, 0)));
 
@@ -177,7 +130,7 @@ public class App {
 
         titlebar.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
 
-        JButton exitButton = new JButton (getIcon("icons/close2.png", BUTTON_SIZE));
+        JButton exitButton = new JButton(getIcon("icons/close2.png", BUTTON_SIZE));
         exitButton.setFocusable(false);
         exitButton.setSize(new Dimension(20, 20));
         exitButton.addActionListener(e -> exit(0));
@@ -193,7 +146,8 @@ public class App {
     }
 
     public static void setMusicTitle(String title) {
-        if (title.length() > MUSIC_TITLE_CHAR_LIMIT) musicTitle.setText(title.substring(0, MUSIC_TITLE_CHAR_LIMIT) + "...");
+        if (title.length() > MUSIC_TITLE_CHAR_LIMIT)
+            musicTitle.setText(title.substring(0, MUSIC_TITLE_CHAR_LIMIT) + "...");
         else musicTitle.setText(title);
     }
 
@@ -202,4 +156,25 @@ public class App {
         initialize();
         frame.setVisible(true);
     }
+
+    private static void createNewTab(String icon, JComponent tab) {
+        JToggleButton button = new JToggleButton(getIcon("icons/" + icon, BUTTON_SIZE));
+        button.setFocusable(false);
+        button.setSelected(false);
+        button.addActionListener(e -> {
+            mainPanel.remove(1);
+            mainPanel.add(tabsList.get(tabButtonsList.indexOf(e.getSource())));
+            mainPanel.updateUI();
+            tabButtonsList.forEach(jToggleButton -> jToggleButton.setSelected(false));
+            ((JToggleButton) e.getSource()).setSelected(true);
+        });
+        titlebar.add(button);
+
+        tabButtonsList.add(button);
+        tabsList.add(tab);
+    }
+
 }
+
+
+
