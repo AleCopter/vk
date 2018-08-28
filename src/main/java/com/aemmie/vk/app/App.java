@@ -1,15 +1,14 @@
 package com.aemmie.vk.app;
 
 import com.aemmie.vk.auth.Auth;
+import com.aemmie.vk.core.Tab;
 import com.aemmie.vk.music.Player;
-import com.aemmie.vk.news.NewsApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 
 import static java.lang.System.exit;
@@ -18,21 +17,19 @@ public class App {
     private static Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static JFrame frame;
-    public static JPanel listPane = new JPanel();
 
     private static JPanel titlebar = new JPanel();
     private static JPanel mainPanel = new JPanel();
 
-    private static JScrollPane newsPanel = new JScrollPane(listPane);
-    private static JPanel messagePanel = new JPanel();
-    private static JPanel musicPanel = new JPanel();
 
-    private static ArrayList<JComponent> tabsList = new ArrayList<>();
+    private static ArrayList<Tab> tabsList = new ArrayList<>();
     private static ArrayList<JToggleButton> tabButtonsList = new ArrayList<>();
 
     private static JButton playButton;
 
     private static JTextField musicTitle;
+
+    private static int titlebar_instrument_id;
 
     private static final int BUTTON_SIZE = 40;
     private static final int MEDIA_BUTTON_SIZE = 25;
@@ -45,24 +42,10 @@ public class App {
 
     private static void initialize() {
         frameInit();
-        listPane.setBackground(Color.DARK_GRAY);
-        listPane.setLayout(new BoxLayout(listPane, BoxLayout.Y_AXIS));
 
-        newsPanel.getVerticalScrollBar().setUnitIncrement(20);
-        newsPanel.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-            @Override
-            public void adjustmentValueChanged(AdjustmentEvent e) {
-                JScrollBar bar = (JScrollBar) e.getSource();
+        //tabsList.get(0).init();
 
-                if (bar.getMaximum() > 500 && (1.0 * bar.getValue() / bar.getMaximum() > 0.9 || bar.getMaximum() - bar.getValue() < 1000) && NewsApi.ready) {
-                    NewsApi.updateNews(15);
-                }
-            }
-        });
-        newsPanel.setBorder(null);
-        listPane.setBorder(null);
-
-        NewsApi.updateNews(30);
+        //MusicApi.get(Auth.getMyId());
     }
 
     private static void frameInit() {
@@ -70,9 +53,10 @@ public class App {
         frame.add(mainPanel);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         titlebarInit();
-        mainPanel.add(titlebar);
-        mainPanel.add(newsPanel);
 
+        mainPanel.add(titlebar);
+        mainPanel.add(tabsList.get(0));
+        setTab(tabButtonsList.get(0));
 
         frame.setIconImage(new ImageIcon("icons/vk2.png").getImage());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -91,9 +75,10 @@ public class App {
         titlebar.setAlignmentY(Component.TOP_ALIGNMENT);
         titlebar.setBorder(new LineBorder(Color.BLACK, 1));
 
-        createNewTab("news.png", newsPanel);
-        createNewTab("messages.png", messagePanel);
-        createNewTab("music.png", musicPanel);
+        createNewTab("news.png", new NewsTab());
+        //createNewTab("messages.png", null);
+        //createNewTab("music.png", null);
+        createNewTab("options.png", new OptionsTab());
 
         titlebar.add(Box.createRigidArea(new Dimension(450, 0)));
 
@@ -129,6 +114,9 @@ public class App {
         titlebar.add(musicTitle);
 
         titlebar.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
+        titlebar_instrument_id = titlebar.getComponentCount();
+        titlebar.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
+        titlebar.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
 
         JButton exitButton = new JButton(getIcon("icons/close2.png", BUTTON_SIZE));
         exitButton.setFocusable(false);
@@ -157,21 +145,27 @@ public class App {
         frame.setVisible(true);
     }
 
-    private static void createNewTab(String icon, JComponent tab) {
+    private static void createNewTab(String icon, Tab tab) {
         JToggleButton button = new JToggleButton(getIcon("icons/" + icon, BUTTON_SIZE));
         button.setFocusable(false);
         button.setSelected(false);
-        button.addActionListener(e -> {
-            mainPanel.remove(1);
-            mainPanel.add(tabsList.get(tabButtonsList.indexOf(e.getSource())));
-            mainPanel.updateUI();
-            tabButtonsList.forEach(jToggleButton -> jToggleButton.setSelected(false));
-            ((JToggleButton) e.getSource()).setSelected(true);
-        });
+        button.addActionListener(e -> setTab((JToggleButton) e.getSource()));
         titlebar.add(button);
 
         tabButtonsList.add(button);
         tabsList.add(tab);
+    }
+
+    private static void setTab(JToggleButton tabButton) {
+        mainPanel.remove(1);
+        Tab tabFromList = tabsList.get(tabButtonsList.indexOf(tabButton));
+        mainPanel.add(tabFromList);
+        mainPanel.updateUI();
+
+        titlebar.remove(titlebar_instrument_id);
+        titlebar.add(tabFromList.getTopPanel(), titlebar_instrument_id);
+        tabButtonsList.forEach(jToggleButton -> jToggleButton.setSelected(false));
+        tabButton.setSelected(true);
     }
 
 }

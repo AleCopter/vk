@@ -17,7 +17,7 @@ public class MusicApi {
 
     private static Type audioListType = new TypeToken<ArrayList<Audio>>() {}.getType();
 
-    public static List<Audio> get(String owner_id) throws Exception {
+    public static List<Audio> get(String owner_id) {
         JsonObject json = new VKApiRequest("audio.get", true)
                 .param("owner_id", owner_id).run();
         if (json != null) {
@@ -26,7 +26,7 @@ public class MusicApi {
         return null;
     }
 
-    public static void getPlaylists(String owner_id) throws Exception {
+    public static void getPlaylists(String owner_id) {
         String codePlaylists = "var audio = API.audio.getPlaylists({owner_id: Args.owner_id, count: 200});return {count: audio.count, items: audio.items};";
         JsonObject json = new VKApiRequest("execute", true)
                 .param("owner_id", owner_id)

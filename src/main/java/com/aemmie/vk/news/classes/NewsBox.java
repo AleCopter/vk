@@ -73,19 +73,20 @@ public class NewsBox extends JPanel {
                         if (mainImage == null) {
                             mainImage = new JLabel(image);
                             mainImage.setAlignmentX(this.getAlignmentX());
-                            if (post.attachmentsList.size() > 1) mainPanel.add(Box.createRigidArea(new Dimension(Options.NEWS_WIDTH, 10)));
+                            if (post.attachmentsList.size() > 1 && post.attachmentsList.get(1).getKey().equals("photo"))  {
+                                mainPanel.add(Box.createRigidArea(new Dimension(Options.NEWS_WIDTH, 10)));
+                                JLabel finalMainImage = mainImage;
+                                mainImage.addMouseListener(new MouseAdapter() {
+                                    @Override
+                                    public void mouseReleased(MouseEvent e) {
+                                        active[0] += e.getX() > finalMainImage.getIcon().getIconWidth() / 2 ? +1 : -1;
+                                        if (active[0] < 0) active[0] = photoList.size() - 1;
+                                        finalMainImage.setIcon(photoList.get(active[0] % photoList.size()));
+                                        toggleButton(buttonList, active[0]);
+                                    }
+                                });
+                            }
                             mainPanel.add(mainImage);
-                        } else {
-                            JLabel finalMainImage = mainImage;
-                            mainImage.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mouseReleased(MouseEvent e) {
-                                    active[0] += e.getX() > finalMainImage.getIcon().getIconWidth() / 2 ? -1 : +1;
-                                    if (active[0] < 0) active[0] = photoList.size() - 1;
-                                    finalMainImage.setIcon(photoList.get(active[0] % photoList.size()));
-                                    toggleButton(buttonList, active[0]);
-                                }
-                            });
                         }
 
                         JToggleButton button = new JToggleButton(String.valueOf(photoList.size()));

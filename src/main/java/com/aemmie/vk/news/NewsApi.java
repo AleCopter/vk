@@ -1,6 +1,5 @@
 package com.aemmie.vk.news;
 
-import com.aemmie.vk.app.App;
 import com.aemmie.vk.basic.Group;
 import com.aemmie.vk.core.VKApiRequest;
 import com.aemmie.vk.news.classes.NewsBox;
@@ -31,6 +30,8 @@ public class NewsApi {
 
     private static int last = 0;
 
+    private static JPanel panel;
+
     public static void updateNews(int count) {
         ready = false;
 
@@ -56,8 +57,8 @@ public class NewsApi {
                             if (s == last) continue;
                             last = s;
                             post.parse();
-                            App.listPane.add(new NewsBox(post));
-                            App.listPane.updateUI();
+                            panel.add(new NewsBox(post));
+                            panel.updateUI();
                         }
                     }
                     ready = true;
@@ -68,6 +69,10 @@ public class NewsApi {
 
     public static void refresh() {
         next = null;
-        App.listPane.removeAll();
+        panel.removeAll();
+    }
+
+    public static void setPanel(JPanel panel) {
+        NewsApi.panel = panel;
     }
 }
