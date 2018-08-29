@@ -46,6 +46,7 @@ public class App {
         //tabsList.get(0).init();
 
         Player.setAudioList(Auth.getMyId());
+        //new VKApiRequest("video.get").param("owner_id", "323289722").param("videos", "323289722_456244969").run();
     }
 
     private static void frameInit() {
@@ -141,8 +142,10 @@ public class App {
 
     public static void main(String[] args) {
         Auth.init();
-        initialize();
-        frame.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            initialize();
+            frame.setVisible(true);
+        });
     }
 
     private static void createNewTab(String icon, Tab tab) {
