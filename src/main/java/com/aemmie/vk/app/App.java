@@ -164,6 +164,7 @@ public class App {
         Tab tabFromList = tabsList.get(tabButtonsList.indexOf(tabButton));
         mainPanel.add(tabFromList);
         mainPanel.updateUI();
+        tabFromList.onUpdate();
 
         titlebar.remove(titlebar_instrument_id);
         titlebar.add(tabFromList.getTopPanel(), titlebar_instrument_id);

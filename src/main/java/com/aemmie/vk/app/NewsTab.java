@@ -54,6 +54,11 @@ public class NewsTab extends Tab {
     }
 
     @Override
+    public void onUpdate() {
+
+    }
+
+    @Override
     public JPanel getTopPanel() {
         return topPanel;
     }
