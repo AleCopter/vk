@@ -3,15 +3,15 @@ package com.aemmie.vk.app;
 import com.aemmie.vk.auth.Auth;
 import com.aemmie.vk.core.Tab;
 import com.aemmie.vk.music.Player;
+import com.cactiCouncil.IntelliJDroplet.WinRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class App {
@@ -61,13 +61,7 @@ public class App {
         setTab(tabButtonsList.get(1));
 
         frame.setIconImage(new ImageIcon("icons/vk2.png").getImage());
-        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                App.exit(0);
-            }
-        });
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("VK client");
         frame.setUndecorated(true);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -129,7 +123,7 @@ public class App {
         JButton exitButton = new JButton(getIcon("icons/close2.png", BUTTON_SIZE));
         exitButton.setFocusable(false);
         exitButton.setSize(new Dimension(20, 20));
-        exitButton.addActionListener(e -> exit(0));
+        exitButton.addActionListener(e -> exit());
         titlebar.add(exitButton);
     }
 
@@ -148,9 +142,11 @@ public class App {
     }
 
     public static void main(String[] args) {
+        Runtime.getRuntime().addShutdownHook(new Thread(App::exit));
         Auth.init();
+        vlcInit();
         SwingUtilities.invokeLater(() -> {
-            new NativeDiscovery().discover();
+            LOGGER.error(LibVlc.INSTANCE.libvlc_get_version());
             initialize();
             frame.setVisible(true);
             ((OptionsTab) tabsList.get(1)).play();
@@ -181,9 +177,34 @@ public class App {
         tabButton.setSelected(true);
     }
 
-    private static void exit(int code) {
+    private static void exit() {
         //
-        System.exit(code);
+        vlcExit();
+        Runtime.getRuntime().halt(0);
+    }
+
+    private static void vlcInit() {
+        try{
+            String vlcPath = WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir");
+            if (vlcPath != null) {
+                WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "vk_path", vlcPath);
+            } else WinRegistry.createKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC");
+            WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir", System.getProperty("user.dir") + "\\lib\\VLC");
+            new NativeDiscovery().discover();
+        } catch (Exception e) {
+            LOGGER.error("VLC INIT ERROR", e);
+        }
+    }
+
+    private static void vlcExit() {
+        try{
+            String vlcPath = WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "vk_path");
+            if (vlcPath != null) {
+                WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir", vlcPath);
+            } else WinRegistry.deleteKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC");
+        } catch (Exception e) {
+            LOGGER.error("VLC EXIT ERROR", e);
+        }
     }
 }
 

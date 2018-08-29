@@ -45,7 +45,7 @@ public class NewsTab extends Tab {
         topPanel.add(refreshButton);
 
         NewsApi.setPanel(panel);
-        NewsApi.updateNews(30);
+        //NewsApi.updateNews(30);
     }
 
     @Override

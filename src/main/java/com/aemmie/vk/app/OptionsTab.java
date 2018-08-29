@@ -57,8 +57,10 @@ public class OptionsTab extends Tab {
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
         EmbeddedMediaPlayer player = mediaPlayerComponent.getMediaPlayer();
         player.setVideoSurface(new MediaPlayerFactory().newVideoSurface(videoSurface));
+        player.setPlaySubItems(true);
+        String url2 = "https://www.youtube.com/watch?v=28zOY_w3Hiw";
+        player.prepareMedia(url2);
         panel.add(videoSurface);
-
     }
 
     @Override
@@ -68,9 +70,10 @@ public class OptionsTab extends Tab {
 
     public void play() {
         String url = "https://cs634103.vkuservideo.net/u8691463/videos/80def9c5fe.720.mp4?extra=83ylt4znpG3nT2Gj2EQeS77QjsWKPfQHOUNH9yLaDBhuSNBb7E4BzNTgREiyrAwUVV0z0HtM8IVoWZGP5vocND8zQ--gn6_vniMlnq8qJKx2bnKjAQzODTUskwoxV4QhYZJvSUpkIg";
-        String url2 = "https://www.youtube.com/embed/SNvC6I1eckU?__ref=vk.kate_mobile";
+
         //App.frame.setContentPane(mediaPlayerComponent);
-        mediaPlayerComponent.getMediaPlayer().playMedia(url);
+        //mediaPlayerComponent.getMediaPlayer().playMedia(url2);
+        mediaPlayerComponent.getMediaPlayer().play();
     }
 
     @Override
