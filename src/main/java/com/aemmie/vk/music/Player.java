@@ -36,17 +36,6 @@ public class Player {
         isChanged = true;
     }
 
-    public static void test() {
-        Audio audio = getNext();
-        for (int i =0; i<1000; i++) {
-            mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
-            try {
-                LOGGER.info(String.valueOf(i));
-                Thread.sleep(100);
-            } catch (InterruptedException e) { }
-        }
-    }
-
     public static void playFirst() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();

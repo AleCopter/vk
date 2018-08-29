@@ -45,7 +45,7 @@ public class App {
 
         //tabsList.get(0).init();
 
-        //MusicApi.get(Auth.getMyId());
+        Player.setAudioList(Auth.getMyId());
     }
 
     private static void frameInit() {
