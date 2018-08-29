@@ -5,13 +5,14 @@ import com.aemmie.vk.core.Tab;
 import com.aemmie.vk.music.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-
-import static java.lang.System.exit;
 
 public class App {
     private static Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -45,7 +46,7 @@ public class App {
 
         //tabsList.get(0).init();
 
-        Player.setAudioList(Auth.getMyId());
+        //Player.setAudioList(Auth.getMyId());
         //new VKApiRequest("video.get").param("owner_id", "323289722").param("videos", "323289722_456244969").run();
     }
 
@@ -57,10 +58,16 @@ public class App {
 
         mainPanel.add(titlebar);
         mainPanel.add(tabsList.get(0));
-        setTab(tabButtonsList.get(0));
+        setTab(tabButtonsList.get(1));
 
         frame.setIconImage(new ImageIcon("icons/vk2.png").getImage());
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                App.exit(0);
+            }
+        });
         frame.setTitle("VK client");
         frame.setUndecorated(true);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -143,8 +150,10 @@ public class App {
     public static void main(String[] args) {
         Auth.init();
         SwingUtilities.invokeLater(() -> {
+            new NativeDiscovery().discover();
             initialize();
             frame.setVisible(true);
+            ((OptionsTab) tabsList.get(1)).play();
         });
     }
 
@@ -172,6 +181,10 @@ public class App {
         tabButton.setSelected(true);
     }
 
+    private static void exit(int code) {
+        //
+        System.exit(code);
+    }
 }
 
 
