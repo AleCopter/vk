@@ -15,8 +15,7 @@ dependencies {
     compile 'com.vk.api:sdk:0.5.12'
     compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.22'
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-    compile "com.teamdev.jxbrowser:jxbrowser-win32:6.21"
-    compile "com.teamdev.jxbrowser:jxbrowser-win64:6.21"
+    compile "com.teamdev.jxbrowser:jxbrowser-cross-platform:6.21"
 
     compile fileTree(dir: 'lib', include: ['*.jar'])
 
