@@ -38,7 +38,10 @@ public class NewsApi {
         new Thread(new Runnable() {
             public void run() {
                 VKApiRequest request = new VKApiRequest("newsfeed.get")
-                        .param("source_ids", "list{1}").param("count", count).param("max_photos", 1);
+                        .param("filters", "post")
+                        .param("source_ids", "list{1}")
+                        .param("count", count)
+                        .param("max_photos", 1);
                 if (next != null) request.param("start_from", next);
                 JsonObject json = request.run();
                 next = json.get("next_from").getAsString();
@@ -52,14 +55,12 @@ public class NewsApi {
                         groups.put(group.id, group);
                     }
                     for (Post post : (Collection<Post>) VKApiRequest.gson.fromJson(json.get("items"), postListType)) {
-                        if (post.type.equals("post")) {
-                            int s = post.hashCode();
-                            if (s == last) continue;
-                            last = s;
-                            post.parse();
-                            panel.add(new NewsBox(post));
-                            panel.updateUI();
-                        }
+                        int s = post.hashCode();
+                        if (s == last) continue;
+                        last = s;
+                        post.parse();
+                        panel.add(new NewsBox(post));
+                        panel.updateUI();
                     }
                     ready = true;
                 }
