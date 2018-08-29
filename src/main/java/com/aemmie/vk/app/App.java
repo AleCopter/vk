@@ -190,7 +190,10 @@ public class App {
                 if (WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "vk_path") == null) {
                     WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "vk_path", vlcPath);
                 }
-            } else WinRegistry.createKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC");
+            } else {
+                WinRegistry.createKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN");
+                WinRegistry.createKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC");
+            }
             WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir", System.getProperty("user.dir") + "\\lib\\VLC");
             new NativeDiscovery().discover();
         } catch (Exception e) {
@@ -203,7 +206,7 @@ public class App {
             String vlcPath = WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "vk_path");
             if (vlcPath != null) {
                 WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir", vlcPath);
-            } else WinRegistry.deleteKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC");
+            } else WinRegistry.deleteKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN");
         } catch (Exception e) {
             LOGGER.error("VLC EXIT ERROR", e);
         }
