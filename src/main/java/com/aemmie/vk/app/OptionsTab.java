@@ -1,7 +1,7 @@
 package com.aemmie.vk.app;
 
 import com.aemmie.vk.core.Tab;
-import com.cactiCouncil.IntelliJDroplet.DropletEditor;
+import com.aemmie.vk.core.WebBrowser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,8 +43,7 @@ public class OptionsTab extends Tab {
         //save.setMaximumSize(buttonsSize);
         topPanel.add(save);
 
-        DropletEditor videoPlayer = new DropletEditor();
-        panel.add(videoPlayer.view);
+        panel.add(new WebBrowser().setURL("https://www.youtube.com/embed/SNvC6I1eckU?__ref=vk.kate_mobile").add());
     }
 
     @Override
