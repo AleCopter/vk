@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.lang.reflect.Field;
 
@@ -84,7 +85,18 @@ public class OptionsTab extends Tab {
 
     private void createOptions() {
         panel.removeAll();
-        panel.add(createIntegerOption("test width", "NEWS_WIDTH", 300, 700));
+
+        Dimension boxDim = new Dimension(1000, Integer.MAX_VALUE);
+        Dimension rigidDim = new Dimension(1000, 20);
+
+        panel.add(Box.createRigidArea(rigidDim));
+        JPanel box1 = new JPanel();
+        box1.setLayout(new BoxLayout(box1, BoxLayout.Y_AXIS));
+        box1.setMaximumSize(boxDim);
+        panel.add(box1);
+
+        for (int i=0; i<30; i++)
+        box1.add(createIntegerOption("test width", "NEWS_WIDTH", 300, 700));
 
         panel.updateUI();
     }
@@ -99,17 +111,18 @@ public class OptionsTab extends Tab {
 
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-            panel.setBackground(Color.DARK_GRAY);
+            panel.setBorder(new LineBorder(Color.BLACK, 1));
 
             JTextField text = new JTextField(name);
             text.setEditable(false);
             text.setBorder(null);
-            text.setBackground(Color.WHITE);
-            text.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
-            text.setMaximumSize(new Dimension(500, 20));
+            Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 30);
+            text.setFont(font);
+            text.setMaximumSize(new Dimension(500, 60));
             panel.add(text);
 
             JSlider slider = new JSlider(JSlider.HORIZONTAL, left, right, (int)field.get(options));
+            slider.setFont(font);
             slider.addChangeListener(e -> {
                 JSlider source = (JSlider)e.getSource();
                 if (!source.getValueIsAdjusting()) {
