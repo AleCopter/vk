@@ -6,7 +6,6 @@ import com.aemmie.vk.music.Player;
 import com.cactiCouncil.IntelliJDroplet.WinRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
@@ -147,7 +146,6 @@ public class App {
         Auth.init();
         //vlcInit();
         SwingUtilities.invokeLater(() -> {
-            LOGGER.error(LibVlc.INSTANCE.libvlc_get_version());
             initialize();
             frame.setVisible(true);
         });
