@@ -22,7 +22,7 @@ public class NewsTab extends Tab {
         panel.setBorder(null);
 
         scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(Options.SCROLL_RATE);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(App.options.SCROLL_RATE);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> {
             JScrollBar bar = (JScrollBar) e.getSource();
@@ -45,7 +45,7 @@ public class NewsTab extends Tab {
         topPanel.add(refreshButton);
 
         NewsApi.setPanel(panel);
-        //NewsApi.updateNews(30);
+        NewsApi.updateNews(30);
     }
 
     @Override

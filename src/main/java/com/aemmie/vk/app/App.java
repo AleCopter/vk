@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public class App {
     private static Logger LOGGER = LoggerFactory.getLogger(App.class);
+    public static Options options = Options.load();
 
     public static JFrame frame;
 
@@ -144,12 +145,11 @@ public class App {
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(App::exit));
         Auth.init();
-        vlcInit();
+        //vlcInit();
         SwingUtilities.invokeLater(() -> {
             LOGGER.error(LibVlc.INSTANCE.libvlc_get_version());
             initialize();
             frame.setVisible(true);
-            ((OptionsTab) tabsList.get(1)).play();
         });
     }
 
@@ -178,8 +178,7 @@ public class App {
     }
 
     private static void exit() {
-        //
-        vlcExit();
+        //vlcExit();
         Runtime.getRuntime().halt(0);
     }
 

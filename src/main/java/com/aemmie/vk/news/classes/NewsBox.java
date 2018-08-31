@@ -1,6 +1,6 @@
 package com.aemmie.vk.news.classes;
 
-import com.aemmie.vk.app.Options;
+import com.aemmie.vk.app.App;
 import com.aemmie.vk.basic.Doc;
 import com.aemmie.vk.basic.Group;
 import com.aemmie.vk.basic.Photo;
@@ -24,32 +24,40 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+
 public class NewsBox extends JPanel {
 
     private static Logger LOGGER = LoggerFactory.getLogger(NewsBox.class);
 
-    public NewsBox(Post post) {
+    private NewsBox() {
         super();
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setBackground(Color.WHITE);
-        this.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+    }
+
+    public static NewsBox create(Post post) {
+        if (check(post)) return null;
+
+        NewsBox box = new NewsBox();
+
+        box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
+        box.setBackground(Color.WHITE);
+        box.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(new LineBorder(Color.WHITE, 10));
         mainPanel.setBackground(Color.WHITE);
-        this.setBackground(Color.DARK_GRAY);
+        box.setBackground(Color.DARK_GRAY);
 
         if (post.text != null && !post.text.equals("")) {
             JTextArea text = new JTextArea(post.text);
             text.setEditable(false);
-            text.setMaximumSize(new Dimension(Options.NEWS_WIDTH, 0));
-            text.setAlignmentX(this.getAlignmentX());
+            text.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 0));
+            text.setAlignmentX(box.getAlignmentX());
             text.setLineWrap(true);
             text.setWrapStyleWord(true);
             text.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 14));
             mainPanel.add(text);
-            mainPanel.add(Box.createRigidArea(new Dimension(Options.NEWS_WIDTH, 5)));
+            mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
         }
 
         ArrayList<ImageIcon> photoList = new ArrayList<>();
@@ -66,15 +74,15 @@ public class NewsBox extends JPanel {
             try {
                 switch (pair.getKey()) {
                     case "photo": {
-                        ImageIcon image = getScaledImage(Options.NEWS_MAX_QUALITY ?
+                        ImageIcon image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
                                 PhotoSize.getMaxQuality(((Photo) pair.getValue()).sizes).url :
                                 PhotoSize.get(((Photo) pair.getValue()).sizes, 'x').url);
                         photoList.add(image);
                         if (mainImage == null) {
                             mainImage = new JLabel(image);
-                            mainImage.setAlignmentX(this.getAlignmentX());
+                            mainImage.setAlignmentX(box.getAlignmentX());
                             if (post.attachmentsList.size() > 1 && post.attachmentsList.get(1).getKey().equals("photo"))  {
-                                mainPanel.add(Box.createRigidArea(new Dimension(Options.NEWS_WIDTH, 10)));
+                                mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
                                 JLabel finalMainImage = mainImage;
                                 mainImage.addMouseListener(new MouseAdapter() {
                                     @Override
@@ -138,17 +146,17 @@ public class NewsBox extends JPanel {
                                 played = !played;
                             }
                         });
-                        image.setAlignmentX(this.getAlignmentX());
-                        mainPanel.add(Box.createRigidArea(new Dimension(Options.NEWS_WIDTH, 10)));
+                        image.setAlignmentX(box.getAlignmentX());
+                        mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
                         mainPanel.add(image);
                         break;
                     }
                     default:
-                        mainPanel.add(Box.createRigidArea(new Dimension(Options.NEWS_WIDTH, 10)));
+                        mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
                         JTextArea def = new JTextArea("-[" + pair.getKey() + "]- not supported");
                         def.setEditable(false);
-                        def.setMaximumSize(new Dimension(Options.NEWS_WIDTH, 0));
-                        def.setAlignmentX(this.getAlignmentX());
+                        def.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 0));
+                        def.setAlignmentX(box.getAlignmentX());
                         def.setLineWrap(true);
                         def.setWrapStyleWord(true);
                         mainPanel.add(def);
@@ -163,14 +171,14 @@ public class NewsBox extends JPanel {
             for (JToggleButton button : buttonList) {
                 buttonPanel.add(button);
             }
-            buttonPanel.setMinimumSize(new Dimension(Options.NEWS_WIDTH, 20));
+            buttonPanel.setMinimumSize(new Dimension(App.options.NEWS_WIDTH, 20));
             buttonPanel.setVisible(true);
             buttonList.get(0).setSelected(true);
         }
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-        bottomPanel.setMaximumSize(new Dimension(Options.NEWS_WIDTH, 20));
+        bottomPanel.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 20));
         bottomPanel.setBackground(Color.WHITE);
         if (post.source_id < 0) {
             Group group = NewsApi.groups.get(-1 * post.source_id);
@@ -197,13 +205,19 @@ public class NewsBox extends JPanel {
         right.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
         bottomPanel.add(right);
 
-        mainPanel.add(Box.createRigidArea(new Dimension(Options.NEWS_WIDTH, 10)));
+        mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
         mainPanel.add(bottomPanel);
 
         mainPanel.add(Box.createVerticalGlue());
 
-        add(mainPanel);
-        add(Box.createRigidArea(new Dimension(0, 30)));
+        box.add(mainPanel);
+        box.add(Box.createRigidArea(new Dimension(0, 30)));
+        return box;
+    }
+
+    private static boolean check(Post post) {
+
+        return false;
     }
 
     private static void toggleButton(ArrayList<JToggleButton> list, int n) {
@@ -214,14 +228,15 @@ public class NewsBox extends JPanel {
     }
 
     private static ImageIcon getScaledImage(String src) throws MalformedURLException {
-        return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(Options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
-    }
-
-    private static ImageIcon getDefaultScaledImage(String src) throws MalformedURLException {
-        return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(Options.NEWS_WIDTH, -1, Image.SCALE_DEFAULT));
+        return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
     }
 
     private static ImageIcon getScaledImage(BufferedImage src) {
-        return new ImageIcon(new ImageIcon(src).getImage().getScaledInstance(Options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
+        return new ImageIcon(new ImageIcon(src).getImage().getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
     }
+
+    private static ImageIcon getDefaultScaledImage(String src) throws MalformedURLException {
+        return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_DEFAULT));
+    }
+
 }
