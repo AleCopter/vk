@@ -158,6 +158,8 @@ public class App {
         button.addActionListener(e -> setTab((JToggleButton) e.getSource()));
         titlebar.add(button);
 
+        tab.init();
+
         tabButtonsList.add(button);
         tabsList.add(tab);
     }
