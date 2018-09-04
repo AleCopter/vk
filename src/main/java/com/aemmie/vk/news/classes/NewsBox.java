@@ -239,8 +239,8 @@ public class NewsBox extends JPanel {
             //endregion
 
             JPanel bottomPanel = new JPanel();
-            bottomPanel.setLayout(new BorderLayout());
-            bottomPanel.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 20));
+            bottomPanel.setLayout(new GridLayout(1, 0));
+            bottomPanel.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 30));
             bottomPanel.setBackground(Color.WHITE);
             if (post.source_id < 0) {
                 Group group = NewsApi.groups.get(-1 * post.source_id);
@@ -249,7 +249,6 @@ public class NewsBox extends JPanel {
                 groupImage.setText(group.name);
                 groupImage.setBorder(null);
                 groupImage.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
-                groupImage.setSize(new Dimension(App.options.NEWS_WIDTH - 150, 20));
 
                 bottomPanel.add(groupImage);
             }
