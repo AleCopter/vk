@@ -237,22 +237,19 @@ public class NewsBox extends JPanel {
             //endregion
 
             JPanel bottomPanel = new JPanel();
-            bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+            bottomPanel.setLayout(new BorderLayout());
             bottomPanel.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 20));
             bottomPanel.setBackground(Color.WHITE);
             if (post.source_id < 0) {
                 Group group = NewsApi.groups.get(-1 * post.source_id);
                 JLabel groupImage = new JLabel(group.image, SwingConstants.LEFT);
 
-                //FIXME: set max width of group name
-                int textWidth = (App.options.NEWS_WIDTH - 100) / 12;
-                groupImage.setText(group.name.length() > textWidth ? group.name.substring(0, textWidth) + "..." : group.name);
+                groupImage.setText(group.name);
                 groupImage.setBorder(null);
                 groupImage.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
-                groupImage.setSize(new Dimension(100, 20));
+                groupImage.setSize(new Dimension(App.options.NEWS_WIDTH - 150, 20));
 
                 bottomPanel.add(groupImage);
-                bottomPanel.add(Box.createHorizontalGlue());
             }
 
             String info = "❤ " + post.likes.count;
