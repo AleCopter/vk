@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -29,7 +30,10 @@ public class NewsBox extends JPanel {
     }
 
     public static NewsBox create(Post post) {
-        if (check(post)) return null;
+        if (isBadPost(post)) {
+            LOGGER.info("SKIPPED: \n" + post.text);
+            return null;
+        }
 
         NewsBox box = new NewsBox();
 
@@ -276,7 +280,16 @@ public class NewsBox extends JPanel {
         }
     }
 
-    private static boolean check(Post post) {
+    private static boolean isBadPost(Post post) {
+
+        if (App.options.NEWS_TEXT_FILTER) {
+            String[] words = App.options.TEXT_FILTER.split(",");
+            if (Arrays.stream(words).parallel().anyMatch(post.text::contains)) return true;
+        }
+
+        if (App.options.NEWS_LIKE_FILTER) {
+            if (post.views != null && post.views.count/post.likes.count > 80) return true;
+        }
 
         return false;
     }

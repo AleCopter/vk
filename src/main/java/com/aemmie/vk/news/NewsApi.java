@@ -60,8 +60,10 @@ public class NewsApi {
                         last = s;
                         post.parse();
                         NewsBox newsbox = NewsBox.create(post);
-                        panel.add(newsbox);
-                        panel.updateUI();
+                        if (newsbox != null) {
+                            panel.add(newsbox);
+                            panel.updateUI();
+                        }
                     }
                     ready = true;
                 }
