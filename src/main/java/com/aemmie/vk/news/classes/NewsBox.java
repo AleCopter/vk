@@ -1,6 +1,7 @@
 package com.aemmie.vk.news.classes;
 
 import com.aemmie.vk.app.App;
+import com.aemmie.vk.basic.Doc;
 import com.aemmie.vk.basic.Group;
 import com.aemmie.vk.basic.PhotoSize;
 import com.aemmie.vk.news.NewsApi;
@@ -13,6 +14,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -127,122 +129,55 @@ public class NewsBox extends JPanel {
                 label.setIcon(image);
 
                 mainPanel.add(label);
+                mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
+                //endregion
+            }
 
+            if (post.docList != null) { //region
+                for (Doc doc : post.docList) {
+                    BufferedImage bufferedImage = ImageIO.read(new URL(PhotoSize.get(doc.sizes, 'o').src));
+                    String text = "►";
+                    int imageType = bufferedImage.getType();
+                    BufferedImage watermarked = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), imageType);
+                    Graphics2D w = (Graphics2D) watermarked.getGraphics();
+                    w.drawImage(bufferedImage, 0, 0, null);
+                    AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
+                    w.setComposite(alphaChannel);
+                    w.setColor(Color.WHITE);
+                    w.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 150));
+                    FontMetrics fontMetrics = w.getFontMetrics();
+                    Rectangle2D rect = fontMetrics.getStringBounds(text, w);
+                    int centerX = (bufferedImage.getWidth() - (int) rect.getWidth()) / 2;
+                    int centerY = (bufferedImage.getHeight() + (int) rect.getHeight() / 2) / 2;
+                    w.drawString(text, centerX, centerY);
+
+                    ImageIcon staticIcon = getScaledImage(watermarked);
+
+                    int width = watermarked.getWidth();
+                    int height = watermarked.getHeight();
+
+                    JLabel image = new JLabel(staticIcon);
+
+                    image.addMouseListener(new MouseAdapter() {
+                        boolean played = false;
+
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                            try {
+                                image.setIcon(played ? staticIcon : getGif((doc).url, width, height));
+                            } catch (Exception ignored) { }
+                            played = !played;
+                        }
+                    });
+                    image.setAlignmentX(box.getAlignmentX());
+                    mainPanel.add(image);
+                    mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
+                }
                 //endregion
             }
 
             //TODO: other types
 
-
-            //region
-            /*
-            for (Pair<String, Object> pair : post.attachmentsList) {
-                try {
-                    switch (pair.getKey()) {
-                        case "photo": {
-                            ImageIcon image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
-                                    PhotoSize.getMaxQuality(((Photo) pair.getValue()).sizes).url :
-                                    PhotoSize.get(((Photo) pair.getValue()).sizes, 'x').url);
-                            photoList.add(image);
-                            if (mainImage == null) {
-                                mainImage = new JLabel(image);
-                                mainImage.setAlignmentX(box.getAlignmentX());
-                                if (post.attachmentsList.size() > 1 && post.attachmentsList.get(1).getKey().equals("photo")) {
-                                    mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
-                                    JLabel finalMainImage = mainImage;
-                                    mainImage.addMouseListener(new MouseAdapter() {
-                                        @Override
-                                        public void mouseReleased(MouseEvent e) {
-                                            active[0] += e.getX() > finalMainImage.getIcon().getIconWidth() / 2 ? +1 : -1;
-                                            if (active[0] < 0) active[0] = photoList.size() - 1;
-                                            finalMainImage.setIcon(photoList.get(active[0] % photoList.size()));
-                                            toggleButton(buttonList, active[0]);
-                                        }
-                                    });
-                                }
-                                mainPanel.add(mainImage);
-                            }
-
-                            JToggleButton button = new JToggleButton(String.valueOf(photoList.size()));
-                            button.setFocusable(false);
-                            buttonList.add(button);
-                            JLabel finalMainImage1 = mainImage;
-                            button.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    int a = Integer.parseInt(button.getText()) - 1;
-                                    active[0] = a;
-                                    finalMainImage1.setIcon(photoList.get(a));
-                                    toggleButton(buttonList, a);
-                                }
-                            });
-                            break;
-                        }
-                        case "doc": {
-                            BufferedImage bufferedImage = ImageIO.read(new URL(PhotoSize.get(((Doc) (pair.getValue())).sizes, 'o').src));
-                            String text = "►";
-                            int imageType = bufferedImage.getType();
-                            BufferedImage watermarked = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), imageType);
-                            Graphics2D w = (Graphics2D) watermarked.getGraphics();
-                            w.drawImage(bufferedImage, 0, 0, null);
-                            AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
-                            w.setComposite(alphaChannel);
-                            w.setColor(Color.WHITE);
-                            w.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 150));
-                            FontMetrics fontMetrics = w.getFontMetrics();
-                            Rectangle2D rect = fontMetrics.getStringBounds(text, w);
-                            int centerX = (bufferedImage.getWidth() - (int) rect.getWidth()) / 2;
-                            int centerY = (bufferedImage.getHeight() + (int) rect.getHeight() / 2) / 2;
-                            w.drawString(text, centerX, centerY);
-
-                            ImageIcon staticIcon = getScaledImage(watermarked);
-
-                            JLabel image = new JLabel(staticIcon);
-
-                            image.addMouseListener(new MouseAdapter() {
-                                boolean played = false;
-
-                                @Override
-                                public void mouseReleased(MouseEvent e) {
-                                    try {
-                                        image.setIcon(played ? staticIcon : getDefaultScaledImage(((Doc) (pair.getValue())).url));
-                                    } catch (MalformedURLException e1) {
-                                        LOGGER.error("GIF ERROR:", e);
-                                    }
-                                    played = !played;
-                                }
-                            });
-                            image.setAlignmentX(box.getAlignmentX());
-                            mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
-                            mainPanel.add(image);
-                            break;
-                        }
-                        default:
-                            mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
-                            JTextArea def = new JTextArea("-[" + pair.getKey() + "]- not supported");
-                            def.setEditable(false);
-                            def.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 0));
-                            def.setAlignmentX(box.getAlignmentX());
-                            def.setLineWrap(true);
-                            def.setWrapStyleWord(true);
-                            mainPanel.add(def);
-                            break;
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("NEWSBOX INIT EXCEPTION:", e);
-                }
-            }
-
-            if (photoList.size() > 1) {
-                for (JToggleButton button : buttonList) {
-                    buttonPanel.add(button);
-                }
-                buttonPanel.setMinimumSize(new Dimension(App.options.NEWS_WIDTH, 20));
-                buttonPanel.setVisible(true);
-                buttonList.get(0).setSelected(true);
-            }
-            */
-            //endregion
 
             JPanel bottomPanel = new JPanel();
             bottomPanel.setLayout(new GridLayout(1, 0));
@@ -305,19 +240,23 @@ public class NewsBox extends JPanel {
 
     private static ImageIcon getScaledImage(String src) throws IOException {
         BufferedImage img = ImageIO.read(new URL(src));
-        if (img.getHeight() * App.options.NEWS_WIDTH / img.getWidth() > App.options.NEWS_HEIGHT) {
-            return new ImageIcon(img.getScaledInstance(-1, App.options.NEWS_HEIGHT, Image.SCALE_SMOOTH));
-        } else {
-            return new ImageIcon(img.getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
-        }
+        return getScaledImage(img);
     }
 
     private static ImageIcon getScaledImage(BufferedImage src) {
-        return new ImageIcon(new ImageIcon(src).getImage().getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
+        if (src.getHeight() * App.options.NEWS_WIDTH / src.getWidth() > App.options.NEWS_HEIGHT) {
+            return new ImageIcon(src.getScaledInstance(-1, App.options.NEWS_HEIGHT, Image.SCALE_SMOOTH));
+        } else {
+            return new ImageIcon(src.getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
+        }
     }
 
-    private static ImageIcon getDefaultScaledImage(String src) throws MalformedURLException {
-        return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_DEFAULT));
+    private static ImageIcon getGif(String src, int width, int height) throws MalformedURLException {
+        if (height * App.options.NEWS_WIDTH / width > App.options.NEWS_HEIGHT) {
+            return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(-1, App.options.NEWS_HEIGHT, Image.SCALE_FAST));
+        } else {
+            return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_FAST));
+        }
     }
 
 }
