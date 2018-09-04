@@ -78,7 +78,7 @@ public class NewsBox extends JPanel {
                     mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
 
                     for (int i = 0; i < post.photoList.size(); i++) {
-                        JToggleButton button = new JToggleButton(String.valueOf(i+1));
+                        JToggleButton button = new JToggleButton(String.valueOf(i + 1));
                         button.setFocusable(false);
                         button.setMargin(new Insets(0, 0, 0, 0));
                         button.addActionListener(e -> {
@@ -90,7 +90,8 @@ public class NewsBox extends JPanel {
                                 image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
                                         PhotoSize.getMaxQuality(sizes).url :
                                         PhotoSize.get(sizes, 'x').url);
-                            } catch (Exception ignored) { }
+                            } catch (Exception ignored) {
+                            }
                             label.setIcon(image);
                             toggleButton(buttonPanel, a);
                         });
@@ -110,7 +111,8 @@ public class NewsBox extends JPanel {
                                 image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
                                         PhotoSize.getMaxQuality(sizes).url :
                                         PhotoSize.get(sizes, 'x').url);
-                            } catch (Exception ignored) { }
+                            } catch (Exception ignored) {
+                            }
                             label.setIcon(image);
                             toggleButton(buttonPanel, active[0]);
                         }
@@ -288,7 +290,7 @@ public class NewsBox extends JPanel {
         }
 
         if (App.options.NEWS_LIKE_FILTER) {
-            if (post.views != null && post.views.count/post.likes.count > 80) return true;
+            if (post.views != null && post.views.count / (post.likes.count + 1) > 80) return true;
         }
 
         return false;
@@ -296,7 +298,7 @@ public class NewsBox extends JPanel {
 
     private static void toggleButton(JPanel list, int n) {
         for (int i = 0; i < list.getComponentCount(); i++) {
-            JToggleButton button = (JToggleButton)list.getComponent(i);
+            JToggleButton button = (JToggleButton) list.getComponent(i);
             button.setSelected(i == n);
         }
     }
