@@ -47,7 +47,7 @@ public class App {
         //tabsList.get(0).init();
 
         //new VKApiRequest("video.get").param("owner_id", "323289722").param("videos", "323289722_456244969").run();
-        Player.setAudioList(Auth.getMyId());
+        Player.init();
     }
 
     private static void frameInit() {

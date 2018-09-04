@@ -1,6 +1,7 @@
 package com.aemmie.vk.music;
 
 import com.aemmie.vk.app.App;
+import com.aemmie.vk.auth.Auth;
 import com.aemmie.vk.basic.Audio;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
@@ -26,6 +27,11 @@ public class Player {
 
     private static boolean mediaRandom;
     private static boolean isChanged;
+
+    public static void init() {
+        updateVolume(App.options.AUDIO_VOLUME);
+        setAudioList(Auth.getMyId());
+    }
 
     public static void setAudioList(String owner_id) {
         try {
@@ -136,5 +142,13 @@ public class Player {
 
     public static boolean isPaused() {
         return mediaPlayer.getStatus().equals(MediaPlayer.Status.PAUSED);
+    }
+
+    public static void updateVolume(int volume) {
+        double dvolume = 1.0 - Math.cos(volume/100.0*Math.PI/2);
+        if (dvolume < 0.01) dvolume = 0;
+        LOGGER.info(String.valueOf(dvolume));
+        Player.volume = dvolume;
+        if (mediaPlayer != null) mediaPlayer.setVolume(dvolume);
     }
 }

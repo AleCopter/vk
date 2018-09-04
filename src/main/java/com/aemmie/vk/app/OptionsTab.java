@@ -1,11 +1,13 @@
 package com.aemmie.vk.app;
 
 import com.aemmie.vk.core.Tab;
+import com.aemmie.vk.music.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.lang.reflect.Field;
 
@@ -95,8 +97,12 @@ public class OptionsTab extends Tab {
         box1.setMaximumSize(boxDim);
         panel.add(box1);
 
-        box1.add(createIntegerOption("test width", "NEWS_WIDTH", 300, 700));
-        box1.add(createIntegerOption("test height", "NEWS_HEIGHT", 300, 900));
+        box1.add(createIntegerOption("test width", "NEWS_WIDTH", 300, 700, null));
+        box1.add(createIntegerOption("test height", "NEWS_HEIGHT", 300, 900, null));
+        box1.add(createIntegerOption("audio volume", "AUDIO_VOLUME", 8, 100, e -> {
+            JSlider source = (JSlider)e.getSource();
+            Player.updateVolume(source.getValue());
+        })); //TODO: move this shit to top panel
 
         panel.updateUI();
     }
@@ -105,7 +111,7 @@ public class OptionsTab extends Tab {
         options = Options.load();
     }
 
-    private JPanel createIntegerOption(String name, String var, int left, int right) {
+    private JPanel createIntegerOption(String name, String var, int left, int right, ChangeListener customListener) {
         try {
             Field field = Options.class.getField(var);
 
@@ -131,6 +137,7 @@ public class OptionsTab extends Tab {
                     } catch (Exception ignored) { }
                 }
             });
+            if (customListener != null) slider.addChangeListener(customListener);
             panel.add(slider);
             return panel;
         } catch (Exception e) {

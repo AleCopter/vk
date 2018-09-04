@@ -15,6 +15,7 @@ public class Options {
     public String    TEXT_FILTER            = "vk.cc,vk.com,goo.gl,[club";
     public boolean   NEWS_LIKE_FILTER       = true;
     public boolean   PRELOAD_MULTI_PHOTO    = true;
+    public int       AUDIO_VOLUME           = 15;
 
     public void save() {
         try(OutputStream os = new FileOutputStream("config.properties")) {
