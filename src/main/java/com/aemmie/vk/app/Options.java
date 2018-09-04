@@ -20,7 +20,7 @@ public class Options {
             }
 
             props.store(os, null);
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     public static Options load() {
@@ -34,7 +34,7 @@ public class Options {
                 Object value = getValue(props, field.getName(), field.getType());
                 if (value != null) field.set(options, value);
             }
-        } catch (Exception e) { }
+        } catch (Exception ignored) { }
         return options;
     }
 

@@ -73,6 +73,7 @@ public class NewsBox extends JPanel {
 
                     for (int i = 0; i < post.photoList.size(); i++) {
                         JToggleButton button = new JToggleButton(String.valueOf(i+1));
+                        button.setFocusable(false);
                         button.setMargin(new Insets(0, 0, 0, 0));
                         button.addActionListener(e -> {
                             int a = Integer.parseInt(button.getText()) - 1;
@@ -241,28 +242,27 @@ public class NewsBox extends JPanel {
             bottomPanel.setBackground(Color.WHITE);
             if (post.source_id < 0) {
                 Group group = NewsApi.groups.get(-1 * post.source_id);
-                JLabel groupImage = new JLabel(group.image);
+                JLabel groupImage = new JLabel(group.image, SwingConstants.LEFT);
 
-                JTextField groupName = new JTextField("   " + group.name);
-                groupName.setEditable(false);
-                groupName.setBorder(null);
-                groupName.setBackground(Color.WHITE);
-                groupName.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
+                //FIXME: set max width of group name
+                int textWidth = (App.options.NEWS_WIDTH - 100) / 12;
+                groupImage.setText(group.name.length() > textWidth ? group.name.substring(0, textWidth) + "..." : group.name);
+                groupImage.setBorder(null);
+                groupImage.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
+                groupImage.setSize(new Dimension(100, 20));
 
                 bottomPanel.add(groupImage);
-                bottomPanel.add(groupName);
+                bottomPanel.add(Box.createHorizontalGlue());
             }
 
             String info = "❤ " + post.likes.count;
             if (post.views != null) info += "   \uD83D\uDC41 " + post.views.count;
-            JTextField right = new JTextField(info);
+            JLabel right = new JLabel(info, SwingConstants.RIGHT);
             right.setAlignmentX(RIGHT_ALIGNMENT);
-            right.setEditable(false);
-            right.setHorizontalAlignment(SwingConstants.RIGHT);
             right.setBorder(null);
-            right.setBackground(Color.WHITE);
             right.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
             bottomPanel.add(right);
+
 
             mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
             mainPanel.add(bottomPanel);
