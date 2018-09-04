@@ -25,7 +25,7 @@ public class VKApiRequest {
 
     private static final String API_URL = "api.vk.com/method/";
 
-    private static long lastTime = 0;
+    private static int requestsPerLastSecond = 0;
 
     public static Gson gson = new Gson();
 
@@ -56,13 +56,17 @@ public class VKApiRequest {
     public JsonObject run() {
         try {
             //restriction of 3 requests per second
-            //TODO: make request counter
-            long currentTime = System.currentTimeMillis();
-            while (currentTime - lastTime < 400) {
+            requestsPerLastSecond++;
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {}
+                requestsPerLastSecond--;
+            }).start();
+
+            while (requestsPerLastSecond > 3) {
                 Thread.sleep(50);
-                currentTime = System.currentTimeMillis();
             }
-            lastTime = currentTime;
 
             String url = "https://" + API_URL + params.get("method");
             if (!params.containsKey("access_token")) params.put("access_token", Auth.getAccessToken());
