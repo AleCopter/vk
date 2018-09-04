@@ -88,21 +88,27 @@ public class App {
         prevButton.setFocusable(false);
         prevButton.setBorderPainted(false);
         prevButton.setContentAreaFilled(false);
-        prevButton.addActionListener(e -> Player.skip());
+        prevButton.addActionListener(e -> Player.prev());
         titlebar.add(prevButton);
 
         playButton = new JButton(PLAY_ICON);
         playButton.setFocusable(false);
         playButton.setBorderPainted(false);
         playButton.setContentAreaFilled(false);
-        playButton.addActionListener(e -> Player.playFirst());
+        playButton.addActionListener(e -> {
+            if (playButton.getIcon().equals(PLAY_ICON)) {
+                Player.play();
+            } else {
+                Player.pause();
+            }
+        });
         titlebar.add(playButton);
 
         JButton nextButton = new JButton(getIcon("icons/next.png", MEDIA_BUTTON_SIZE));
         nextButton.setFocusable(false);
         nextButton.setBorderPainted(false);
         nextButton.setContentAreaFilled(false);
-        nextButton.addActionListener(e -> Player.skip());
+        nextButton.addActionListener(e -> Player.next());
         titlebar.add(nextButton);
 
         titlebar.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
@@ -183,7 +189,7 @@ public class App {
     }
 
     private static void vlcInit() {
-        try{
+        try {
             String vlcPath = WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir");
             if (vlcPath != null) {
                 if (WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "vk_path") == null) {
@@ -201,7 +207,7 @@ public class App {
     }
 
     private static void vlcExit() {
-        try{
+        try {
             String vlcPath = WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "vk_path");
             if (vlcPath != null) {
                 WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir", vlcPath);

@@ -34,30 +34,52 @@ public class Player {
             LOGGER.error("EXCEPTION:", e);
         }
         isChanged = true;
+        if (mediaRandom) {
+            toggleRandom();
+            toggleRandom(); //reload random list
+        }
     }
 
     public static void playFirst() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
-        Audio audio = getNext();
+        Audio audio = getNext(true);
         mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
         configure();
     }
 
+    public static void play() {
+        if (mediaPlayer == null) playFirst();
+        if (isPaused()) mediaPlayer.play();
+        App.setPlayIcon(true);
+    }
+
+    public static void pause() {
+        if (mediaPlayer != null) mediaPlayer.pause();
+        App.setPlayIcon(false);
+    }
+
     public static void play(Audio audio) {
+
+    }
+
+    public static void next() {
+        Audio audio = getNext(true);
         if (mediaPlayer != null) {
             mediaPlayer.stop();
+            mediaPlayer.dispose();
         }
         mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
         configure();
     }
 
-    public static void skip() {
-        Audio audio = getNext();
-        mediaPlayer.stop();
-        mediaPlayer.dispose(); //TODO: MEMORY LEAK!!!!
-        mediaPlayer = null;
+    public static void prev() {
+        Audio audio = getNext(false);
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+        }
         mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
         configure();
     }
@@ -73,11 +95,13 @@ public class Player {
         }
     }
 
-    public static Audio getNext() {
+    public static Audio getNext(boolean forward) {
         List<Audio> list = mediaRandom ? randomAudioList : audioList;
         Audio ret;
         if (currentAudio != null) {
-            ret = list.get((list.indexOf(currentAudio)+1) % list.size());
+            int index = (list.indexOf(currentAudio) + (forward ? +1 : -1)) % list.size();
+            if (index < 0) index = list.size() - 1;
+            ret = list.get(index);
         } else {
             ret = list.get(0);
         }
@@ -86,7 +110,7 @@ public class Player {
         App.setPlayIcon(true);
         if (ret.getUrl().equals("")) {
             LOGGER.info(ret.toString() + " SKIPPED");
-            return getNext();
+            return getNext(forward);
         }
         LOGGER.info(ret.toString());
         return ret;
@@ -96,9 +120,10 @@ public class Player {
         mediaPlayer.setVolume(volume);
         mediaPlayer.play();
         mediaPlayer.setOnEndOfMedia(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 mediaPlayer.stop();
-                Audio audio = getNext();
+                Audio audio = getNext(true);
                 mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
                 configure();
             }
@@ -107,5 +132,9 @@ public class Player {
 
     public static Audio getCurrentAudio() {
         return currentAudio;
+    }
+
+    public static boolean isPaused() {
+        return mediaPlayer.getStatus().equals(MediaPlayer.Status.PAUSED);
     }
 }
