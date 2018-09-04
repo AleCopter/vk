@@ -19,6 +19,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -79,11 +81,24 @@ public class NewsBox extends JPanel {
                     mainPanel.add(buttonPanel);
                     mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
 
+                    List<ImageIcon> imageCache = new ArrayList<>();
+
                     for (int i = 0; i < post.photoList.size(); i++) {
                         JToggleButton button = new JToggleButton(String.valueOf(i + 1));
                         button.setFocusable(false);
                         button.setMargin(new Insets(0, 0, 0, 0));
-                        button.addActionListener(e -> {
+                        if (App.options.PRELOAD_MULTI_PHOTO) {
+                            imageCache.add(getScaledImage(App.options.NEWS_MAX_QUALITY ?
+                                    PhotoSize.getMaxQuality(post.photoList.get(i).sizes).url :
+                                    PhotoSize.get(post.photoList.get(i).sizes, 'x').url));
+                        }
+                        button.addActionListener(App.options.PRELOAD_MULTI_PHOTO ?
+                                e -> {
+                            int a = Integer.parseInt(button.getText()) - 1;
+                            active[0] = a;
+                            label.setIcon(imageCache.get(active[0]));
+                            toggleButton(buttonPanel, a);
+                        } : e -> {
                             int a = Integer.parseInt(button.getText()) - 1;
                             active[0] = a;
                             List<PhotoSize> sizes = post.photoList.get(active[0] % post.photoList.size()).sizes;
@@ -95,7 +110,19 @@ public class NewsBox extends JPanel {
                         buttonPanel.add(button);
                     }
 
-                    label.addMouseListener(new MouseAdapter() {
+                    label.addMouseListener(App.options.PRELOAD_MULTI_PHOTO ?
+                            new MouseAdapter() {
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                            active[0] += e.getX() > label.getIcon().getIconWidth() / 2 ? +1 : -1;
+                            active[0] = active[0] % post.photoList.size();
+                            if (active[0] < 0) active[0] = post.photoList.size() - 1;
+
+                            label.setIcon(imageCache.get(active[0]));
+                            toggleButton(buttonPanel, active[0]);
+
+                        }
+                    } : new MouseAdapter() {
                         @Override
                         public void mouseReleased(MouseEvent e) {
                             active[0] += e.getX() > label.getIcon().getIconWidth() / 2 ? +1 : -1;
@@ -228,7 +255,7 @@ public class NewsBox extends JPanel {
         if (App.options.NEWS_LIKE_FILTER) {
             if (    ((post.views != null) && (post.likes.count < 10) && (post.views.count > 500))
                     ||
-                    ((System.currentTimeMillis() / 1000 - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80)))
+                    ((Instant.now().getEpochSecond() - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80)))
                 return true;
         }
 

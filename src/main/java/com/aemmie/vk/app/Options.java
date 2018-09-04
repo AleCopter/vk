@@ -7,13 +7,14 @@ import java.lang.reflect.Field;
 import java.util.Properties;
 
 public class Options {
-    public int       NEWS_WIDTH         = 470;
-    public int       NEWS_HEIGHT        = 500;
-    public int       SCROLL_RATE        = 20;
-    public boolean   NEWS_MAX_QUALITY   = true;
-    public boolean   NEWS_TEXT_FILTER   = true;
-    public String    TEXT_FILTER        = "vk.cc,vk.com,goo.gl,[club";
-    public boolean   NEWS_LIKE_FILTER   = true;
+    public int       NEWS_WIDTH             = 470;
+    public int       NEWS_HEIGHT            = 500;
+    public int       SCROLL_RATE            = 20;
+    public boolean   NEWS_MAX_QUALITY       = true;
+    public boolean   NEWS_TEXT_FILTER       = true;
+    public String    TEXT_FILTER            = "vk.cc,vk.com,goo.gl,[club";
+    public boolean   NEWS_LIKE_FILTER       = true;
+    public boolean   PRELOAD_MULTI_PHOTO    = true;
 
     public void save() {
         try(OutputStream os = new FileOutputStream("config.properties")) {
