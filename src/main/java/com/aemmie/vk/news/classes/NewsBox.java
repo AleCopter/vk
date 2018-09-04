@@ -284,7 +284,7 @@ public class NewsBox extends JPanel {
 
     private static boolean isBadPost(Post post) {
 
-        if (App.options.NEWS_TEXT_FILTER) {
+        if (App.options.NEWS_TEXT_FILTER && post.text != null) {
             String[] words = App.options.TEXT_FILTER.split(",");
             if (Arrays.stream(words).parallel().anyMatch(post.text::contains)) return true;
         }
