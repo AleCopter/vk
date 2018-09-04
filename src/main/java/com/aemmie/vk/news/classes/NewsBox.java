@@ -42,8 +42,7 @@ public class NewsBox extends JPanel {
             mainPanel.setBackground(Color.WHITE);
             box.setBackground(Color.DARK_GRAY);
 
-            if (post.text != null && !post.text.equals("")) {
-                //region
+            if (post.text != null && !post.text.equals("")) { //region
                 JTextArea text = new JTextArea(post.text);
                 text.setEditable(false);
                 text.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 0));
@@ -56,8 +55,7 @@ public class NewsBox extends JPanel {
                 //endregion
             }
 
-            if (post.photoList != null) {
-                //region
+            if (post.photoList != null) { //region
                 JLabel label = new JLabel();
                 label.setAlignmentX(box.getAlignmentX());
 
@@ -66,11 +64,16 @@ public class NewsBox extends JPanel {
                     final Integer[] active = {0};
 
                     JPanel buttonPanel = new JPanel();
-                    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+                    buttonPanel.setBackground(mainPanel.getBackground());
+                    buttonPanel.setLayout(new GridLayout(1, 0));
+                    Dimension dim = new Dimension(App.options.NEWS_WIDTH, 20);
+                    buttonPanel.setMaximumSize(dim);
                     mainPanel.add(buttonPanel);
+                    mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
 
                     for (int i = 0; i < post.photoList.size(); i++) {
                         JToggleButton button = new JToggleButton(String.valueOf(i+1));
+                        button.setMargin(new Insets(0, 0, 0, 0));
                         button.addActionListener(e -> {
                             int a = Integer.parseInt(button.getText()) - 1;
                             active[0] = a;
