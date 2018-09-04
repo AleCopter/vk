@@ -204,7 +204,7 @@ public class NewsBox extends JPanel {
             bottomPanel.add(right);
 
 
-            mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 10)));
+            mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
             mainPanel.add(bottomPanel);
 
             mainPanel.add(Box.createVerticalGlue());
@@ -225,8 +225,11 @@ public class NewsBox extends JPanel {
             if (Arrays.stream(words).parallel().anyMatch(post.text::contains)) return true;
         }
 
-        if (App.options.NEWS_LIKE_FILTER && System.currentTimeMillis() / 1000 - post.date > 720) {
-            if (post.views != null && post.views.count / (post.likes.count + 1) > 80) return true;
+        if (App.options.NEWS_LIKE_FILTER) {
+            if (    ((post.views != null) && (post.likes.count < 10) && (post.views.count > 500))
+                    ||
+                    ((System.currentTimeMillis() / 1000 - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80)))
+                return true;
         }
 
         return false;

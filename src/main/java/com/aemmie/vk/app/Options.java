@@ -12,7 +12,7 @@ public class Options {
     public int       SCROLL_RATE        = 20;
     public boolean   NEWS_MAX_QUALITY   = true;
     public boolean   NEWS_TEXT_FILTER   = true;
-    public String    TEXT_FILTER        = "vk.cc,vk.com,[club";
+    public String    TEXT_FILTER        = "vk.cc,vk.com,goo.gl,[club";
     public boolean   NEWS_LIKE_FILTER   = true;
 
     public void save() {
