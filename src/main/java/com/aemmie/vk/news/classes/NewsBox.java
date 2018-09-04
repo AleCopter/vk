@@ -7,12 +7,14 @@ import com.aemmie.vk.news.NewsApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -84,7 +86,7 @@ public class NewsBox extends JPanel {
                                 image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
                                         PhotoSize.getMaxQuality(sizes).url :
                                         PhotoSize.get(sizes, 'x').url);
-                            } catch (MalformedURLException ignored) { }
+                            } catch (Exception ignored) { }
                             label.setIcon(image);
                             toggleButton(buttonPanel, a);
                         });
@@ -104,7 +106,7 @@ public class NewsBox extends JPanel {
                                 image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
                                         PhotoSize.getMaxQuality(sizes).url :
                                         PhotoSize.get(sizes, 'x').url);
-                            } catch (MalformedURLException ignored) { }
+                            } catch (Exception ignored) { }
                             label.setIcon(image);
                             toggleButton(buttonPanel, active[0]);
                         }
@@ -287,8 +289,13 @@ public class NewsBox extends JPanel {
         }
     }
 
-    private static ImageIcon getScaledImage(String src) throws MalformedURLException {
-        return new ImageIcon(new ImageIcon(new URL(src)).getImage().getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
+    private static ImageIcon getScaledImage(String src) throws IOException {
+        BufferedImage img = ImageIO.read(new URL(src));
+        if (img.getHeight() * App.options.NEWS_WIDTH / img.getWidth() > App.options.NEWS_HEIGHT) {
+            return new ImageIcon(img.getScaledInstance(-1, App.options.NEWS_HEIGHT, Image.SCALE_SMOOTH));
+        } else {
+            return new ImageIcon(img.getScaledInstance(App.options.NEWS_WIDTH, -1, Image.SCALE_SMOOTH));
+        }
     }
 
     private static ImageIcon getScaledImage(BufferedImage src) {

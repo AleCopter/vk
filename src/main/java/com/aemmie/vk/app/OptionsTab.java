@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.lang.reflect.Field;
 
@@ -95,8 +95,8 @@ public class OptionsTab extends Tab {
         box1.setMaximumSize(boxDim);
         panel.add(box1);
 
-        for (int i=0; i<30; i++)
         box1.add(createIntegerOption("test width", "NEWS_WIDTH", 300, 700));
+        box1.add(createIntegerOption("test height", "NEWS_HEIGHT", 300, 900));
 
         panel.updateUI();
     }
@@ -111,7 +111,7 @@ public class OptionsTab extends Tab {
 
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-            panel.setBorder(new LineBorder(Color.BLACK, 1));
+            panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
             JTextField text = new JTextField(name);
             text.setEditable(false);

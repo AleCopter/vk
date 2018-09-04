@@ -8,6 +8,7 @@ import java.util.Properties;
 
 public class Options {
     public int       NEWS_WIDTH         = 470;
+    public int       NEWS_HEIGHT        = 500;
     public int       SCROLL_RATE        = 20;
     public boolean   NEWS_MAX_QUALITY   = true;
 
