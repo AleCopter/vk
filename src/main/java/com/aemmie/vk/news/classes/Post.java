@@ -16,10 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Post {
-    private static final transient Type photoType = new TypeToken<Photo>() {}.getType();
-    private static final transient Type audioType = new TypeToken<Audio>() {}.getType();
-    private static final transient Type docType = new TypeToken<Doc>() {}.getType();
-    private static final transient Type photoSizeType = new TypeToken<ArrayList<PhotoSize>>() {}.getType();
+    private static final transient Type photoType = new TypeToken<Photo>() {
+    }.getType();
+    private static final transient Type audioType = new TypeToken<Audio>() {
+    }.getType();
+    private static final transient Type docType = new TypeToken<Doc>() {
+    }.getType();
+    private static final transient Type photoSizeType = new TypeToken<ArrayList<PhotoSize>>() {
+    }.getType();
 
     public String type;
     Integer source_id;
@@ -34,10 +38,10 @@ public class Post {
     transient List<Photo> photoList;
     transient List<Audio> audioList;
     transient List<Video> videoList; //TODO: add video class
-    transient List<Doc>   docList;   //TODO: add other doc types (now only GIF)
+    transient List<Doc> docList;   //TODO: add other doc types (now only GIF)
 
     public void parse() {
-        if (attachments!=null) {
+        if (attachments != null) {
             for (JsonElement attachment : attachments) {
                 JsonObject attachmentRoot = attachment.getAsJsonObject();
                 String type = attachmentRoot.get("type").getAsString();
@@ -61,17 +65,19 @@ public class Post {
                 }
             }
         }
-        attachments=null;
+        attachments = null;
     }
 
     @Override
     public int hashCode() {
-        return Math.abs(source_id+date);
+        return Math.abs(source_id + date);
     }
 }
+
 class Likes {
     public Integer count;
 }
+
 class Views {
     public Integer count;
 }

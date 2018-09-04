@@ -87,14 +87,9 @@ public class NewsBox extends JPanel {
                             int a = Integer.parseInt(button.getText()) - 1;
                             active[0] = a;
                             List<PhotoSize> sizes = post.photoList.get(active[0] % post.photoList.size()).sizes;
-                            ImageIcon image = null;
-                            try {
-                                image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
-                                        PhotoSize.getMaxQuality(sizes).url :
-                                        PhotoSize.get(sizes, 'x').url);
-                            } catch (Exception ignored) {
-                            }
-                            label.setIcon(image);
+                            setImage(label, App.options.NEWS_MAX_QUALITY ?
+                                    PhotoSize.getMaxQuality(sizes).url :
+                                    PhotoSize.get(sizes, 'x').url);
                             toggleButton(buttonPanel, a);
                         });
                         buttonPanel.add(button);
@@ -108,14 +103,9 @@ public class NewsBox extends JPanel {
                             if (active[0] < 0) active[0] = post.photoList.size() - 1;
 
                             List<PhotoSize> sizes = post.photoList.get(active[0]).sizes;
-                            ImageIcon image = null;
-                            try {
-                                image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
-                                        PhotoSize.getMaxQuality(sizes).url :
-                                        PhotoSize.get(sizes, 'x').url);
-                            } catch (Exception ignored) {
-                            }
-                            label.setIcon(image);
+                            setImage(label, App.options.NEWS_MAX_QUALITY ?
+                                    PhotoSize.getMaxQuality(sizes).url :
+                                    PhotoSize.get(sizes, 'x').url);
                             toggleButton(buttonPanel, active[0]);
                         }
                     });
@@ -123,10 +113,9 @@ public class NewsBox extends JPanel {
                     toggleButton(buttonPanel, 0);
                 }
 
-                ImageIcon image = getScaledImage(App.options.NEWS_MAX_QUALITY ?
+                setImage(label, App.options.NEWS_MAX_QUALITY ?
                         PhotoSize.getMaxQuality(post.photoList.get(0).sizes).url :
                         PhotoSize.get(post.photoList.get(0).sizes, 'x').url);
-                label.setIcon(image);
 
                 mainPanel.add(label);
                 mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
@@ -163,9 +152,11 @@ public class NewsBox extends JPanel {
 
                         @Override
                         public void mouseReleased(MouseEvent e) {
-                            try {
-                                image.setIcon(played ? staticIcon : getGif((doc).url, width, height));
-                            } catch (Exception ignored) { }
+                            if (played) {
+                                image.setIcon(staticIcon);
+                            } else {
+                                setImageGif(image, doc.url, width, height);
+                            }
                             played = !played;
                         }
                     });
@@ -176,7 +167,17 @@ public class NewsBox extends JPanel {
                 //endregion
             }
 
-            //TODO: other types
+            if (post.videoList != null) { //region
+
+                //endregion
+            }
+
+            if (post.audioList != null) { //region
+
+                //endregion
+            }
+
+            //TODO: video, audio & other types
 
 
             JPanel bottomPanel = new JPanel();
@@ -224,7 +225,7 @@ public class NewsBox extends JPanel {
             if (Arrays.stream(words).parallel().anyMatch(post.text::contains)) return true;
         }
 
-        if (App.options.NEWS_LIKE_FILTER) {
+        if (App.options.NEWS_LIKE_FILTER && System.currentTimeMillis() / 1000 - post.date > 720) {
             if (post.views != null && post.views.count / (post.likes.count + 1) > 80) return true;
         }
 
@@ -236,6 +237,26 @@ public class NewsBox extends JPanel {
             JToggleButton button = (JToggleButton) list.getComponent(i);
             button.setSelected(i == n);
         }
+    }
+
+    private static void setImage(JLabel image, String src) {
+        new Thread(() -> {
+            try {
+                image.setIcon(getScaledImage(src));
+            } catch (IOException ignored) { }
+        }).start();
+    }
+
+    private static void setImage(JLabel image, BufferedImage src) {
+        new Thread(() -> image.setIcon(getScaledImage(src))).start();
+    }
+
+    private static void setImageGif(JLabel image, String src, int width, int height) {
+        new Thread(() -> {
+            try {
+                image.setIcon(getGif(src, width, height));
+            } catch (IOException ignored) { }
+        }).start();
     }
 
     private static ImageIcon getScaledImage(String src) throws IOException {
