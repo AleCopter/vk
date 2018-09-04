@@ -9,11 +9,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import javafx.util.Pair;
+import com.vk.api.sdk.objects.video.Video;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Post {
@@ -23,22 +22,19 @@ public class Post {
     private static final transient Type photoSizeType = new TypeToken<ArrayList<PhotoSize>>() {}.getType();
 
     public String type;
-    public Integer source_id;
+    Integer source_id;
     Integer date;
     String post_type;
     String text;
-    public Integer marked_as_ads;
+    Integer marked_as_ads;
     JsonArray attachments;
-    JsonObject photos;
-    public Likes likes;
-    public Views views;
+    Likes likes;
+    Views views;
 
-
-    public transient List<Pair<String, Object>> attachmentsList;
-
-    public Post() {
-        attachmentsList = new LinkedList<>();
-    }
+    transient List<Photo> photoList;
+    transient List<Audio> audioList;
+    transient List<Video> videoList; //TODO: add video class
+    transient List<Doc>   docList;   //TODO: add other doc types (now only GIF)
 
     public void parse() {
         if (attachments!=null) {
@@ -47,26 +43,25 @@ public class Post {
                 String type = attachmentRoot.get("type").getAsString();
                 switch (type) {
                     case "photo":
-                        attachmentsList.add(new Pair<>("photo", VKApiRequest.gson.fromJson(attachmentRoot.getAsJsonObject("photo"), photoType)));
+                        if (photoList == null) photoList = new ArrayList<>();
+                        photoList.add(VKApiRequest.gson.fromJson(attachmentRoot.getAsJsonObject("photo"), photoType));
                         break;
                     case "audio":
-                        attachmentsList.add(new Pair<>("audio", VKApiRequest.gson.fromJson(attachmentRoot.getAsJsonObject("audio"), audioType)));
+                        if (audioList == null) audioList = new ArrayList<>();
+                        audioList.add(VKApiRequest.gson.fromJson(attachmentRoot.getAsJsonObject("audio"), audioType));
                         break;
                     case "doc":
-                        Pair<String, Object> pair = new Pair<>("doc", VKApiRequest.gson.fromJson(attachmentRoot.getAsJsonObject("doc"), docType));
-                        Doc doc = (Doc)pair.getValue();
-                        if (doc.preview.has("photo")) doc.sizes = VKApiRequest.gson.fromJson(doc.preview.get("photo").getAsJsonObject().get("sizes"), photoSizeType);
-                        attachmentsList.add(pair);
+                        Doc doc = VKApiRequest.gson.fromJson(attachmentRoot.getAsJsonObject("doc"), docType);
+                        if (doc.preview.has("photo")) {
+                            doc.sizes = VKApiRequest.gson.fromJson(doc.preview.get("photo").getAsJsonObject().get("sizes"), photoSizeType);
+                            if (docList == null) docList = new ArrayList<>();
+                            docList.add(doc);
+                        }
                         break;
-                    default:
-                        attachmentsList.add(new Pair<>(type, null));
                 }
             }
-        } else if (photos!=null) {
-            attachmentsList.add(new Pair<>("photo", VKApiRequest.gson.fromJson(photos.getAsJsonArray("items").get(0), photoType)));
         }
         attachments=null;
-        photos=null;
     }
 
     @Override
