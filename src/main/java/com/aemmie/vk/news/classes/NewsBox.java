@@ -2,9 +2,7 @@ package com.aemmie.vk.news.classes;
 
 import com.aemmie.vk.app.App;
 import com.aemmie.vk.basic.Doc;
-import com.aemmie.vk.basic.Group;
 import com.aemmie.vk.basic.PhotoSize;
-import com.aemmie.vk.news.NewsApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +10,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -28,6 +28,8 @@ import java.util.List;
 public class NewsBox extends JPanel {
 
     private static Logger LOGGER = LoggerFactory.getLogger(NewsBox.class);
+
+    private static Dimension defaultSpace = new Dimension(App.options.NEWS_WIDTH, 5);
 
     private NewsBox() {
         super();
@@ -52,34 +54,24 @@ public class NewsBox extends JPanel {
             mainPanel.setBackground(Color.WHITE);
             box.setBackground(Color.DARK_GRAY);
 
-            if (post.text != null && !post.text.equals("")) { //region
-                JTextArea text = new JTextArea(post.text);
-                text.setEditable(false);
-                text.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 0));
-                text.setAlignmentX(box.getAlignmentX());
-                text.setLineWrap(true);
-                text.setWrapStyleWord(true);
-                text.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 14));
-                mainPanel.add(text);
+            if (post.text != null && !post.text.equals("")) {
+                mainPanel.add(new PostText(post));
                 mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
-                //endregion
             }
 
             if (post.photoList != null) { //region
                 JLabel label = new JLabel();
                 label.setAlignmentX(box.getAlignmentX());
 
-                //TODO: add option for preload multiple images
                 if (post.photoList.size() > 1) {
                     final Integer[] active = {0};
 
                     JPanel buttonPanel = new JPanel();
                     buttonPanel.setBackground(mainPanel.getBackground());
                     buttonPanel.setLayout(new GridLayout(1, 0));
-                    Dimension dim = new Dimension(App.options.NEWS_WIDTH, 20);
-                    buttonPanel.setMaximumSize(dim);
+                    buttonPanel.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 20));
                     mainPanel.add(buttonPanel);
-                    mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
+                    mainPanel.add(Box.createRigidArea(defaultSpace));
 
                     List<ImageIcon> imageCache = new ArrayList<>();
 
@@ -88,64 +80,46 @@ public class NewsBox extends JPanel {
                         button.setFocusable(false);
                         button.setMargin(new Insets(0, 0, 0, 0));
                         if (App.options.PRELOAD_MULTI_PHOTO) {
-                            imageCache.add(getScaledImage(App.options.NEWS_MAX_QUALITY ?
-                                    PhotoSize.getMaxQuality(post.photoList.get(i).sizes).url :
-                                    PhotoSize.get(post.photoList.get(i).sizes, 'x').url));
+                            imageCache.add(getScaledImage(getUrlFromPhotoList(post.photoList.get(i).sizes)));
                         }
-                        button.addActionListener(App.options.PRELOAD_MULTI_PHOTO ?
-                                e -> {
-                            int a = Integer.parseInt(button.getText()) - 1;
-                            active[0] = a;
-                            label.setIcon(imageCache.get(active[0]));
-                            toggleButton(buttonPanel, a);
-                        } : e -> {
-                            int a = Integer.parseInt(button.getText()) - 1;
-                            active[0] = a;
-                            List<PhotoSize> sizes = post.photoList.get(active[0] % post.photoList.size()).sizes;
-                            setImage(label, App.options.NEWS_MAX_QUALITY ?
-                                    PhotoSize.getMaxQuality(sizes).url :
-                                    PhotoSize.get(sizes, 'x').url);
-                            toggleButton(buttonPanel, a);
-                        });
+                        button.addActionListener(new ActionListener() { //region
+                            boolean preload = App.options.PRELOAD_MULTI_PHOTO;
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                int a = Integer.parseInt(button.getText()) - 1;
+                                active[0] = a;
+
+                                if (preload) label.setIcon(imageCache.get(active[0]));
+                                else setImage(label, getUrlFromPhotoList(post.photoList.get(active[0]).sizes));
+
+                                toggleButton(buttonPanel, a);
+                            }
+                        }); //endregion
                         buttonPanel.add(button);
                     }
 
-                    label.addMouseListener(App.options.PRELOAD_MULTI_PHOTO ?
-                            new MouseAdapter() {
+                    label.addMouseListener(new MouseAdapter() { //region
+                        boolean preload = App.options.PRELOAD_MULTI_PHOTO;
                         @Override
                         public void mouseReleased(MouseEvent e) {
                             active[0] += e.getX() > label.getIcon().getIconWidth() / 2 ? +1 : -1;
                             active[0] = active[0] % post.photoList.size();
                             if (active[0] < 0) active[0] = post.photoList.size() - 1;
 
-                            label.setIcon(imageCache.get(active[0]));
-                            toggleButton(buttonPanel, active[0]);
+                            if (preload) label.setIcon(imageCache.get(active[0]));
+                            else setImage(label, getUrlFromPhotoList(post.photoList.get(active[0]).sizes));
 
-                        }
-                    } : new MouseAdapter() {
-                        @Override
-                        public void mouseReleased(MouseEvent e) {
-                            active[0] += e.getX() > label.getIcon().getIconWidth() / 2 ? +1 : -1;
-                            active[0] = active[0] % post.photoList.size();
-                            if (active[0] < 0) active[0] = post.photoList.size() - 1;
-
-                            List<PhotoSize> sizes = post.photoList.get(active[0]).sizes;
-                            setImage(label, App.options.NEWS_MAX_QUALITY ?
-                                    PhotoSize.getMaxQuality(sizes).url :
-                                    PhotoSize.get(sizes, 'x').url);
                             toggleButton(buttonPanel, active[0]);
                         }
-                    });
+                    }); //endregion
 
                     toggleButton(buttonPanel, 0);
                 }
 
-                setImage(label, App.options.NEWS_MAX_QUALITY ?
-                        PhotoSize.getMaxQuality(post.photoList.get(0).sizes).url :
-                        PhotoSize.get(post.photoList.get(0).sizes, 'x').url);
+                setImage(label, getUrlFromPhotoList(post.photoList.get(0).sizes));
 
                 mainPanel.add(label);
-                mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
+                mainPanel.add(Box.createRigidArea(defaultSpace));
                 //endregion
             }
 
@@ -189,7 +163,7 @@ public class NewsBox extends JPanel {
                     });
                     image.setAlignmentX(box.getAlignmentX());
                     mainPanel.add(image);
-                    mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
+                    mainPanel.add(Box.createRigidArea(defaultSpace));
                 }
                 //endregion
             }
@@ -207,33 +181,8 @@ public class NewsBox extends JPanel {
             //TODO: video, audio & other types
 
 
-            JPanel bottomPanel = new JPanel();
-            bottomPanel.setLayout(new GridLayout(1, 0));
-            bottomPanel.setMaximumSize(new Dimension(App.options.NEWS_WIDTH, 30));
-            bottomPanel.setBackground(Color.WHITE);
-            if (post.source_id < 0) {
-                Group group = NewsApi.groups.get(-1 * post.source_id);
-                JLabel groupImage = new JLabel(group.image, SwingConstants.LEFT);
-
-                groupImage.setText(group.name);
-                groupImage.setBorder(null);
-                groupImage.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
-
-                bottomPanel.add(groupImage);
-            }
-
-            String info = "❤ " + post.likes.count;
-            if (post.views != null) info += "   \uD83D\uDC41 " + post.views.count;
-            JLabel right = new JLabel(info, SwingConstants.RIGHT);
-            right.setAlignmentX(RIGHT_ALIGNMENT);
-            right.setBorder(null);
-            right.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
-            bottomPanel.add(right);
-
-
-            mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
-            mainPanel.add(bottomPanel);
-
+            mainPanel.add(Box.createRigidArea(defaultSpace));
+            mainPanel.add(new BottomPanel(post)); //group, likes & views
             mainPanel.add(Box.createVerticalGlue());
 
             box.add(mainPanel);
@@ -253,13 +202,20 @@ public class NewsBox extends JPanel {
         }
 
         if (App.options.NEWS_LIKE_FILTER) {
-            if (    ((post.views != null) && (post.likes.count < 10) && (post.views.count > 500))
+            if ((post.views != null) && (
+                    ((post.likes.count < 10) && (post.views.count > 500))
                     ||
-                    ((Instant.now().getEpochSecond() - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80)))
+                    ((Instant.now().getEpochSecond() - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80))))
                 return true;
         }
 
         return false;
+    }
+
+    private static String getUrlFromPhotoList(List<PhotoSize> list) {
+        return App.options.NEWS_MAX_QUALITY ?
+                PhotoSize.getMaxQuality(list).url :
+                PhotoSize.get(list, 'x').url;
     }
 
     private static void toggleButton(JPanel list, int n) {
