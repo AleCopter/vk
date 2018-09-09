@@ -207,6 +207,8 @@ public class NewsBox extends JPanel {
             if ((post.views != null) && (
                     ((post.likes.count < 3) && (post.views.count > 80))
                     ||
+                    ((post.likes.count < 10) && (post.views.count > 500))
+                    ||
                     ((Instant.now().getEpochSecond() - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80))))
                 return true;
         }

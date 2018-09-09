@@ -93,6 +93,10 @@ public class Player {
         }
     }
 
+    public static void toggleReplay() {
+        mediaReplay = !mediaReplay;
+    }
+
     public static Audio getNext(boolean forward) {
         List<Audio> list = mediaRandom ? randomAudioList : audioList;
         Audio ret;

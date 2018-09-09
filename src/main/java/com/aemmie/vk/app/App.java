@@ -31,13 +31,13 @@ public class App {
             @Override
             public void keyReleased(GlobalKeyEvent event) {
                 switch (event.getVirtualKeyCode()) {
-                    case 176:
+                    case 176: //media_next
                         TitleBar.audioNext();
                         break;
-                    case 177:
+                    case 177: //media_prev
                         TitleBar.audioPrev();
                         break;
-                    case 179:
+                    case 179: //media_play
                         TitleBar.audioPlayPause();
                         break;
                 }
