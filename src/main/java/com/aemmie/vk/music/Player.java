@@ -1,6 +1,7 @@
 package com.aemmie.vk.music;
 
 import com.aemmie.vk.app.App;
+import com.aemmie.vk.app.TitleBar;
 import com.aemmie.vk.auth.Auth;
 import com.aemmie.vk.basic.Audio;
 import javafx.embed.swing.JFXPanel;
@@ -26,6 +27,7 @@ public class Player {
     private static double volume = 0.1;
 
     private static boolean mediaRandom;
+    private static boolean mediaReplay;
     private static boolean isChanged;
 
     public static void init() {
@@ -47,47 +49,37 @@ public class Player {
     }
 
     public static void playFirst() {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
-        Audio audio = getNext(true);
-        mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
-        configure();
+        play(getNext(true));
     }
 
     public static void play() {
         if (mediaPlayer == null) playFirst();
         if (isPaused()) mediaPlayer.play();
-        App.setPlayIcon(true);
+        TitleBar.setPlayIcon(true);
     }
 
     public static void pause() {
         if (mediaPlayer != null) mediaPlayer.pause();
-        App.setPlayIcon(false);
+        TitleBar.setPlayIcon(false);
     }
 
     public static void play(Audio audio) {
-
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+        }
+        mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
+        mediaPlayer.setVolume(volume);
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.setOnEndOfMedia(() -> play(mediaReplay ? currentAudio : getNext(true)));
     }
 
     public static void next() {
-        Audio audio = getNext(true);
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.dispose();
-        }
-        mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
-        configure();
+        play(getNext(true));
     }
 
     public static void prev() {
-        Audio audio = getNext(false);
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.dispose();
-        }
-        mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
-        configure();
+        play(getNext(false));
     }
 
     public static void toggleRandom() {
@@ -112,28 +104,14 @@ public class Player {
             ret = list.get(0);
         }
         currentAudio = ret;
-        App.setMusicTitle(currentAudio.toString());
-        App.setPlayIcon(true);
+        TitleBar.setMusicTitle(currentAudio.toString());
+        TitleBar.setPlayIcon(true);
         if (ret.getUrl().equals("")) {
             LOGGER.info(ret.toString() + " SKIPPED");
             return getNext(forward);
         }
         LOGGER.info(ret.toString());
         return ret;
-    }
-
-    private static void configure() {
-        mediaPlayer.setVolume(volume);
-        mediaPlayer.play();
-        mediaPlayer.setOnEndOfMedia(new Runnable() {
-            @Override
-            public void run() {
-                mediaPlayer.stop();
-                Audio audio = getNext(true);
-                mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
-                configure();
-            }
-        });
     }
 
     public static Audio getCurrentAudio() {
@@ -145,7 +123,7 @@ public class Player {
     }
 
     public static void updateVolume(int volume) {
-        double dvolume = 1.0 - Math.cos(volume/100.0*Math.PI/2);
+        double dvolume = 1.0 - Math.cos(volume / 100.0 * Math.PI / 2);
         if (dvolume < 0.01) dvolume = 0;
         LOGGER.info(String.valueOf(dvolume));
         Player.volume = dvolume;

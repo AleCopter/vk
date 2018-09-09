@@ -169,6 +169,8 @@ public class NewsBox extends JPanel {
             }
 
             if (post.videoList != null) { //region
+                //new VKApiRequest("video.get").param("owner_id", "323289722").param("videos", "323289722_456244969").run();
+                //how to get video link
 
                 //endregion
             }
@@ -203,7 +205,7 @@ public class NewsBox extends JPanel {
 
         if (App.options.NEWS_LIKE_FILTER) {
             if ((post.views != null) && (
-                    ((post.likes.count < 10) && (post.views.count > 500))
+                    ((post.likes.count < 3) && (post.views.count > 80))
                     ||
                     ((Instant.now().getEpochSecond() - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80))))
                 return true;
