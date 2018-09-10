@@ -34,7 +34,7 @@ public class TitleBar extends JPanel {
         this.setBorder(new LineBorder(Color.BLACK, 1));
 
         createNewTab("news.png", new NewsTab());
-        //createNewTab("messages.png", null);
+        createNewTab("messages.png", new MessagesTab());
         createNewTab("music.png", new AudioTab());
         createNewTab("options.png", new OptionsTab());
 

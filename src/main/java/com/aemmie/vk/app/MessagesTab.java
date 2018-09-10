@@ -1,20 +1,15 @@
 package com.aemmie.vk.app;
 
 import com.aemmie.vk.core.Tab;
-import com.aemmie.vk.music.Player;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class AudioTab extends Tab {
+public class MessagesTab extends Tab {
     public JPanel panel = new JPanel();
     private JScrollPane scrollPane = new JScrollPane(panel);
 
-    private JPanel topPanel = new JPanel();
-
-    private Dimension buttonsSize = new Dimension(30, 40);
-
-    public AudioTab() {
+    MessagesTab() {
         panel.setBackground(Color.DARK_GRAY);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(null);
@@ -28,9 +23,8 @@ public class AudioTab extends Tab {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(null);
 
-        Player.setAudioPanel(panel);
+        panel.add(new TODO());
     }
-
 
     @Override
     public void init() {

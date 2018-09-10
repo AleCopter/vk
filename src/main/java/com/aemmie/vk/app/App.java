@@ -54,7 +54,7 @@ public class App {
 
         mainPanel.add(new TitleBar());
         mainPanel.add(Box.createRigidArea(new Dimension(0, 0)));
-        TitleBar.setTab(1);
+        TitleBar.setTab(2);
 
         frame.setIconImage(new ImageIcon("icons/vk2.png").getImage());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
