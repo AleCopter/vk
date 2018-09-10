@@ -1,22 +1,28 @@
 package com.aemmie.vk.music;
 
-import com.aemmie.vk.app.App;
-import com.aemmie.vk.app.TitleBar;
 import com.aemmie.vk.auth.Auth;
 import com.aemmie.vk.basic.Audio;
+import com.aemmie.vk.options.AudioOptions;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.aemmie.vk.app.TopAudioPanel.setMusicTitle;
+import static com.aemmie.vk.app.TopAudioPanel.setPlayIcon;
+
 public class Player {
     private static final JFXPanel fxPanel = new JFXPanel(); //init javafx
     private static final Logger LOGGER = LoggerFactory.getLogger(Player.class);
+
+    public static AudioOptions options = AudioOptions.load();
 
     private static MediaPlayer mediaPlayer;
 
@@ -24,15 +30,22 @@ public class Player {
 
     private static List<Audio> audioList;
     private static List<Audio> randomAudioList;
-    private static double volume = 0.1;
 
-    private static boolean mediaRandom;
-    private static boolean mediaReplay;
     private static boolean isChanged;
 
+    private static JPanel panel;
+
     public static void init() {
-        updateVolume(App.options.AUDIO_VOLUME);
+        updateVolume(options.AUDIO_VOLUME);
+
         setAudioList(Auth.getMyId());
+        for (Audio audio : audioList) {
+            panel.add(new AudioBox(audio));
+            JSeparator separator = new JSeparator();
+            separator.setMaximumSize(new Dimension(500, 10));
+            panel.add(separator);
+        }
+        panel.updateUI();
     }
 
     public static void setAudioList(String owner_id) {
@@ -42,7 +55,7 @@ public class Player {
             LOGGER.error("EXCEPTION:", e);
         }
         isChanged = true;
-        if (mediaRandom) {
+        if (options.RANDOM) {
             toggleRandom();
             toggleRandom(); //reload random list
         }
@@ -55,12 +68,12 @@ public class Player {
     public static void play() {
         if (mediaPlayer == null) playFirst();
         if (isPaused()) mediaPlayer.play();
-        TitleBar.setPlayIcon(true);
+        setPlayIcon(true);
     }
 
     public static void pause() {
         if (mediaPlayer != null) mediaPlayer.pause();
-        TitleBar.setPlayIcon(false);
+        setPlayIcon(false);
     }
 
     public static void play(Audio audio) {
@@ -68,10 +81,13 @@ public class Player {
             mediaPlayer.stop();
             mediaPlayer.dispose();
         }
+        currentAudio = audio;
         mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
-        mediaPlayer.setVolume(volume);
+        updateVolume(options.AUDIO_VOLUME);
         mediaPlayer.setAutoPlay(true);
-        mediaPlayer.setOnEndOfMedia(() -> play(mediaReplay ? currentAudio : getNext(true)));
+        setMusicTitle(currentAudio.toString());
+        setPlayIcon(true);
+        mediaPlayer.setOnEndOfMedia(() -> play(options.REPLAY ? currentAudio : getNext(true)));
     }
 
     public static void next() {
@@ -83,8 +99,8 @@ public class Player {
     }
 
     public static void toggleRandom() {
-        mediaRandom = (!mediaRandom);
-        if (mediaRandom) {
+        options.RANDOM = (!options.RANDOM);
+        if (options.RANDOM) {
             if (isChanged) {
                 randomAudioList = new ArrayList<>(audioList);
                 isChanged = false;
@@ -94,11 +110,11 @@ public class Player {
     }
 
     public static void toggleReplay() {
-        mediaReplay = !mediaReplay;
+        options.REPLAY = !options.REPLAY;
     }
 
     public static Audio getNext(boolean forward) {
-        List<Audio> list = mediaRandom ? randomAudioList : audioList;
+        List<Audio> list = options.RANDOM ? randomAudioList : audioList;
         Audio ret;
         if (currentAudio != null) {
             int index = (list.indexOf(currentAudio) + (forward ? +1 : -1)) % list.size();
@@ -108,13 +124,10 @@ public class Player {
             ret = list.get(0);
         }
         currentAudio = ret;
-        TitleBar.setMusicTitle(currentAudio.toString());
-        TitleBar.setPlayIcon(true);
         if (ret.getUrl().equals("")) {
             LOGGER.info(ret.toString() + " SKIPPED");
             return getNext(forward);
         }
-        LOGGER.info(ret.toString());
         return ret;
     }
 
@@ -127,10 +140,13 @@ public class Player {
     }
 
     public static void updateVolume(int volume) {
+        options.AUDIO_VOLUME = volume;
         double dvolume = 1.0 - Math.cos(volume / 100.0 * Math.PI / 2);
         if (dvolume < 0.01) dvolume = 0;
-        LOGGER.info(String.valueOf(dvolume));
-        Player.volume = dvolume;
         if (mediaPlayer != null) mediaPlayer.setVolume(dvolume);
+    }
+
+    public static void setAudioPanel(JPanel panel) {
+        Player.panel = panel;
     }
 }

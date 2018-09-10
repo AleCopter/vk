@@ -1,7 +1,6 @@
 package com.aemmie.vk.app;
 
 import com.aemmie.vk.core.Tab;
-import com.aemmie.vk.music.Player;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -12,9 +11,6 @@ import static com.aemmie.vk.app.App.exit;
 
 public class TitleBar extends JPanel {
     private static JPanel titlebar; //this
-
-    private static JButton playButton;
-    private static JTextField musicTitle;
 
     private static ArrayList<Tab> tabsList = new ArrayList<>();
     private static ArrayList<JToggleButton> tabButtonsList = new ArrayList<>();
@@ -39,42 +35,14 @@ public class TitleBar extends JPanel {
 
         createNewTab("news.png", new NewsTab());
         //createNewTab("messages.png", null);
-        //createNewTab("music.png", null);
+        createNewTab("music.png", new AudioTab());
         createNewTab("options.png", new OptionsTab());
 
-        this.add(Box.createRigidArea(new Dimension(450, 0)));
+        this.add(Box.createRigidArea(new Dimension(500, 0)));
 
-        JButton prevButton = new JButton(getIcon("icons/prev.png", MEDIA_BUTTON_SIZE));
-        prevButton.setFocusable(false);
-        prevButton.setBorderPainted(false);
-        prevButton.setContentAreaFilled(false);
-        prevButton.addActionListener(e -> audioPrev());
-        this.add(prevButton);
+        this.add(new TopAudioPanel());
 
-        playButton = new JButton(PLAY_ICON);
-        playButton.setFocusable(false);
-        playButton.setBorderPainted(false);
-        playButton.setContentAreaFilled(false);
-        playButton.addActionListener(e -> audioPlayPause());
-        this.add(playButton);
-
-        JButton nextButton = new JButton(getIcon("icons/next.png", MEDIA_BUTTON_SIZE));
-        nextButton.setFocusable(false);
-        nextButton.setBorderPainted(false);
-        nextButton.setContentAreaFilled(false);
-        nextButton.addActionListener(e -> audioNext());
-        this.add(nextButton);
-
-        this.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
-
-        musicTitle = new JTextField();
-        musicTitle.setFocusable(false);
-        musicTitle.setBorder(null);
-        musicTitle.setBackground(this.getBackground());
-        musicTitle.setEditable(false);
-        musicTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
-        this.add(musicTitle);
-
+        this.add(Box.createHorizontalGlue());
         this.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
         titlebar_instrument_id = this.getComponentCount();
         this.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
@@ -84,20 +52,10 @@ public class TitleBar extends JPanel {
         exitButton.setFocusable(false);
         exitButton.setSize(new Dimension(20, 20));
         exitButton.addActionListener(e -> exit());
-        this.add(exitButton);
+        this.add(exitButton, RIGHT_ALIGNMENT);
     }
 
-    public static void setPlayIcon(boolean pause) {
-        playButton.setIcon(pause ? PAUSE_ICON : PLAY_ICON);
-    }
-
-    public static void setMusicTitle(String title) {
-        if (title.length() > MUSIC_TITLE_CHAR_LIMIT)
-            musicTitle.setText(title.substring(0, MUSIC_TITLE_CHAR_LIMIT) + "...");
-        else musicTitle.setText(title);
-    }
-
-    private static ImageIcon getIcon(String path, int size) {
+    static ImageIcon getIcon(String path, int size) {
         return new ImageIcon(new ImageIcon(path).getImage().getScaledInstance(size, size, java.awt.Image.SCALE_SMOOTH));
     }
 
@@ -125,21 +83,18 @@ public class TitleBar extends JPanel {
         App.mainPanel.updateUI();
         tabFromList.onUpdate();
 
+
+        JComponent top = tabFromList.getTopPanel();
         titlebar.remove(titlebar_instrument_id);
-        titlebar.add(tabFromList.getTopPanel(), titlebar_instrument_id);
+        if (top != null) {
+            titlebar.add(top, titlebar_instrument_id);
+        } else {
+            titlebar.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM), titlebar_instrument_id);
+        }
+
         tabButtonsList.forEach(jToggleButton -> jToggleButton.setSelected(false));
         tabButton.setSelected(true);
     }
 
-    static void audioPrev() { Player.prev(); }
 
-    static void audioNext() { Player.next(); }
-
-    static void audioPlayPause() {
-        if (playButton.getIcon().equals(PLAY_ICON)) {
-            Player.play();
-        } else {
-            Player.pause();
-        }
-    }
 }

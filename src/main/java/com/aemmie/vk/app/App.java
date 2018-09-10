@@ -2,6 +2,7 @@ package com.aemmie.vk.app;
 
 import com.aemmie.vk.auth.Auth;
 import com.aemmie.vk.music.Player;
+import com.aemmie.vk.options.AppOptions;
 import com.cactiCouncil.IntelliJDroplet.WinRegistry;
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
@@ -17,7 +18,7 @@ public class App {
     private static Logger LOGGER = LoggerFactory.getLogger(App.class);
     private static JFrame frame;
 
-    public static Options options = Options.load();
+    public static AppOptions options = AppOptions.load();
 
     static JPanel mainPanel = new JPanel();
 
@@ -26,19 +27,19 @@ public class App {
 
         new Thread(Player::init).start();
 
-        GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
+        GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(false);
         keyboardHook.addKeyListener(new GlobalKeyAdapter() {
             @Override
             public void keyReleased(GlobalKeyEvent event) {
                 switch (event.getVirtualKeyCode()) {
                     case 176: //media_next
-                        TitleBar.audioNext();
+                        TopAudioPanel.audioNext();
                         break;
                     case 177: //media_prev
-                        TitleBar.audioPrev();
+                        TopAudioPanel.audioPrev();
                         break;
                     case 179: //media_play
-                        TitleBar.audioPlayPause();
+                        TopAudioPanel.audioPlayPause();
                         break;
                 }
             }
@@ -81,6 +82,7 @@ public class App {
 
     static void exit() {
         //vlcExit();
+        Player.options.save();
         Runtime.getRuntime().halt(0);
     }
 

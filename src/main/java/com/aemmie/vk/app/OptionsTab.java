@@ -1,7 +1,7 @@
 package com.aemmie.vk.app;
 
 import com.aemmie.vk.core.Tab;
-import com.aemmie.vk.music.Player;
+import com.aemmie.vk.options.AppOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ public class OptionsTab extends Tab {
 
     private JPanel topPanel = new JPanel();
 
-    private Options options;
+    private AppOptions options;
 
     private Dimension buttonsSize = new Dimension(100, 40);
 
@@ -38,12 +38,13 @@ public class OptionsTab extends Tab {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(null);
 
+        //region
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
         //topPanel.setLayout(new GridLayout(1, 0));
         JButton loadDefault = new JButton("default");
         loadDefault.setFocusable(false);
         loadDefault.addActionListener(e -> {
-            options = new Options();
+            options = new AppOptions();
             createOptions();
         });
         //loadDefault.setMaximumSize(buttonsSize);
@@ -66,6 +67,7 @@ public class OptionsTab extends Tab {
         });
         //save.setMaximumSize(buttonsSize);
         topPanel.add(save);
+        //endregion
 
         createOptions();
     }
@@ -99,21 +101,17 @@ public class OptionsTab extends Tab {
 
         box1.add(createIntegerOption("test width", "NEWS_WIDTH", 300, 700, null));
         box1.add(createIntegerOption("test height", "NEWS_HEIGHT", 300, 900, null));
-        box1.add(createIntegerOption("audio volume", "AUDIO_VOLUME", 8, 100, e -> {
-            JSlider source = (JSlider)e.getSource();
-            Player.updateVolume(source.getValue());
-        })); //TODO: move this shit to top panel
 
         panel.updateUI();
     }
 
     private void reloadOptions() {
-        options = Options.load();
+        options = AppOptions.load();
     }
 
     private JPanel createIntegerOption(String name, String var, int left, int right, ChangeListener customListener) {
         try {
-            Field field = Options.class.getField(var);
+            Field field = AppOptions.class.getField(var);
 
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
