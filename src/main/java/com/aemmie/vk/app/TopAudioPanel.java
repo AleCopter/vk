@@ -99,6 +99,40 @@ public class TopAudioPanel extends JPanel {
         progressBar.setMinimum(0);
         progressBar.setValue(0);
         progressBar.setMaximumSize(new Dimension(400, 15));
+        progressBar.setEnabled(false);
+//        progressBar.setUI(new BasicSliderUI(progressBar) {
+//            @Override
+//            public void paintTrack(Graphics g) {
+//                Graphics2D g2d = (Graphics2D) g;
+//                Rectangle t = trackRect;
+//                Point2D start = new Point2D.Float(t.x, t.y);
+//                int width = t.width * progressBar.getValue() / progressBar.getMaximum();
+//                Point2D end = new Point2D.Float(t.width, t.height);
+//                Color[] colors = {Color.magenta, Color.blue, Color.cyan,
+//                        Color.green, Color.yellow, Color.red};
+//                LinearGradientPaint p = new LinearGradientPaint(start, end, new float[]{0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f}, colors);
+//                g2d.setPaint(p);
+//                g2d.fillRect(t.x, t.y, width, t.height);
+//            }
+//
+//            @Override
+//            public void paintThumb(Graphics g) {
+//                super.paintThumb(g);
+//            }
+//        });
+        progressBar.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                JSlider source = (JSlider)e.getSource();
+                Point p = e.getPoint();
+                double percent = p.x / ((double) source.getWidth());
+                int range = source.getMaximum() - source.getMinimum();
+                double newVal = range * percent;
+                int result = (int)(source.getMinimum() + newVal);
+                source.setValue(result);
+                Player.setTime(result);
+            }
+        });
         Player.setProgressBar(progressBar);
 
 

@@ -6,6 +6,7 @@ import com.aemmie.vk.options.AudioOptions;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,6 +159,12 @@ public class Player {
         double dvolume = 1.0 - Math.cos(volume / 100.0 * Math.PI / 2);
         if (dvolume < 0.01) dvolume = 0;
         if (mediaPlayer != null) mediaPlayer.setVolume(dvolume);
+    }
+
+    public static void setTime(int millis) {
+        if (mediaPlayer != null) {
+            mediaPlayer.seek(new Duration(millis));
+        }
     }
 
     public static void setAudioPanel(JPanel panel) {
