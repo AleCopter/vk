@@ -26,8 +26,8 @@ public class NewsTab extends Tab {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> {
             JScrollBar bar = (JScrollBar) e.getSource();
-            if (bar.getMaximum() > 500 && (1.0 * bar.getValue() / bar.getMaximum() > 0.9 || bar.getMaximum() - bar.getValue() < 1000) && NewsApi.ready) {
-                NewsApi.updateNews(15);
+            if (NewsApi.ready && (bar.getMaximum() - bar.getValue() < 5000)) {
+                NewsApi.updateNews(5);
             }
         });
 
