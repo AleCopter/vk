@@ -189,6 +189,9 @@ public class Player {
     }
 
     private static void timerStop() {
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 }

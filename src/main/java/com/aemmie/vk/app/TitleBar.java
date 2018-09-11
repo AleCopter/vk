@@ -38,7 +38,7 @@ public class TitleBar extends JPanel {
         createNewTab("music.png", new AudioTab());
         createNewTab("options.png", new OptionsTab());
 
-        this.add(Box.createRigidArea(new Dimension(430, 0)));
+        this.add(Box.createRigidArea(new Dimension(370, 0)));
 
         this.add(new TopAudioPanel());
 
