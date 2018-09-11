@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
+import java.util.Timer;
 
 import static com.aemmie.vk.app.TopAudioPanel.setMusicTitle;
 import static com.aemmie.vk.app.TopAudioPanel.setPlayIcon;
@@ -34,6 +34,9 @@ public class Player {
     private static boolean isChanged;
 
     private static JPanel panel;
+    private static JSlider progressBar;
+
+    private static Timer timer;
 
     public static void init() {
         updateVolume(options.AUDIO_VOLUME);
@@ -46,6 +49,10 @@ public class Player {
             panel.add(separator);
         }
         panel.updateUI();
+
+        List<Audio> list = options.RANDOM ? randomAudioList : audioList;
+        setMusicTitle(list.get(0).toString());
+
     }
 
     public static void setAudioList(String owner_id) {
@@ -69,11 +76,13 @@ public class Player {
         if (mediaPlayer == null) playFirst();
         if (isPaused()) mediaPlayer.play();
         setPlayIcon(true);
+        timerStart();
     }
 
     public static void pause() {
         if (mediaPlayer != null) mediaPlayer.pause();
         setPlayIcon(false);
+        timerStop();
     }
 
     public static void play(Audio audio) {
@@ -81,12 +90,17 @@ public class Player {
             mediaPlayer.stop();
             mediaPlayer.dispose();
         }
+        progressBar.setValue(0);
         currentAudio = audio;
         mediaPlayer = new MediaPlayer(new Media(audio.getUrl()));
         updateVolume(options.AUDIO_VOLUME);
         mediaPlayer.setAutoPlay(true);
         setMusicTitle(currentAudio.toString());
         setPlayIcon(true);
+        mediaPlayer.setOnReady(() -> {
+            timerStart();
+            progressBar.setMaximum((int) mediaPlayer.getMedia().getDuration().toMillis());
+        });
         mediaPlayer.setOnEndOfMedia(() -> play(options.REPLAY ? currentAudio : getNext(true)));
     }
 
@@ -148,5 +162,26 @@ public class Player {
 
     public static void setAudioPanel(JPanel panel) {
         Player.panel = panel;
+    }
+
+    public static void setProgressBar(JSlider progressBar) {
+        Player.progressBar = progressBar;
+    }
+
+    private static void timerStart() {
+        if (timer == null) {
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    if (mediaPlayer != null && progressBar != null) {
+                        progressBar.setValue((int) mediaPlayer.getCurrentTime().toMillis());
+                    }
+                }
+            }, 0, 100);
+        }
+    }
+
+    private static void timerStop() {
+        timer.cancel();
     }
 }

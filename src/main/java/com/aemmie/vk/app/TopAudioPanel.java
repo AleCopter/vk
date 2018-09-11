@@ -12,6 +12,8 @@ public class TopAudioPanel extends JPanel {
     private static JButton playButton;
     private static JLabel musicTitle;
 
+    private static JSlider progressBar;
+
     private static final int MEDIA_BUTTON_SIZE = 22;
     private static final int MUSIC_TITLE_CHAR_LIMIT = 60;
 
@@ -21,11 +23,8 @@ public class TopAudioPanel extends JPanel {
     private static final ImageIcon PAUSE_ICON = TitleBar.getIcon("icons/pause.png", MEDIA_BUTTON_SIZE);
 
     TopAudioPanel() {
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        this.add(leftPanel);
 
         JToggleButton randomButton = new JToggleButton(TitleBar.getIcon("icons/replay.png", 15));
         randomButton.setMargin(new Insets(1, 1, 1, 1));
@@ -42,13 +41,8 @@ public class TopAudioPanel extends JPanel {
         leftPanel.add(shuffleButton);
 
 
-        JPanel midPanel = new JPanel();
-        midPanel.setLayout(new BoxLayout(midPanel, BoxLayout.Y_AXIS));
-        this.add(midPanel);
-
         JPanel midTopPanel = new JPanel();
         midTopPanel.setLayout(new BoxLayout(midTopPanel, BoxLayout.X_AXIS));
-        midPanel.add(midTopPanel);
 
         JSlider volume = new JSlider(SwingConstants.HORIZONTAL, 8, 100, Player.options.AUDIO_VOLUME);
         volume.addChangeListener(e -> {
@@ -69,8 +63,8 @@ public class TopAudioPanel extends JPanel {
             }
         });
         volume.setMaximumSize(new Dimension(160, 20));
-        midPanel.add(volume);
 
+        //region
         JButton prevButton = new JButton(TitleBar.getIcon("icons/prev.png", MEDIA_BUTTON_SIZE));
         prevButton.setFocusable(false);
         prevButton.setBorderPainted(false);
@@ -91,15 +85,60 @@ public class TopAudioPanel extends JPanel {
         nextButton.setContentAreaFilled(false);
         nextButton.addActionListener(e -> audioNext());
         midTopPanel.add(nextButton);
+        //endregion
 
-        this.add(Box.createRigidArea(DEFAULT_HORIZONTAL_DIM));
+        musicTitle = new JLabel(" ", SwingConstants.LEFT);
+        musicTitle.setAlignmentX(LEFT_ALIGNMENT);
 
-        musicTitle = new JLabel();
         musicTitle.setFocusable(false);
         musicTitle.setBorder(null);
         musicTitle.setBackground(this.getBackground());
         musicTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
+
+        progressBar = new JSlider();
+        progressBar.setMinimum(0);
+        progressBar.setValue(0);
+        progressBar.setMaximumSize(new Dimension(400, 15));
+        Player.setProgressBar(progressBar);
+
+
+
+        GridBagLayout layout = new GridBagLayout();
+        this.setLayout(layout);
+        this.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+        //this.setMaximumSize(new Dimension(700, 100));
+        GridBagConstraints c =  new GridBagConstraints();
+
+        c.gridx = 0; c.gridy = 0; c.gridheight = GridBagConstraints.REMAINDER;
+        layout.setConstraints(leftPanel, c);
+        c.gridheight = 1;
+        this.add(leftPanel);
+
+        c.gridx = 1; c.gridy = 1;
+        layout.setConstraints(midTopPanel, c);
+        this.add(midTopPanel);
+
+        c.gridx = 2; c.gridy = 1;
+        layout.setConstraints(musicTitle, c);
         this.add(musicTitle);
+
+        c.gridx = 1; c.gridy = 2;
+        layout.setConstraints(volume, c);
+        this.add(volume);
+
+        c.gridx = 2; c.gridy = 2; c.fill = GridBagConstraints.HORIZONTAL;
+        layout.setConstraints(progressBar, c);
+        c.fill = 0;
+        this.add(progressBar);
+
+
+        //bound this panel to left
+        //!!!!! always last
+        Component glue = Box.createRigidArea(new Dimension(1, 1));
+        c.gridx = 3; c.gridy = 0; c.weightx = 1;
+        layout.setConstraints(glue, c);
+        this.add(glue);
+
     }
 
     public static void setPlayIcon(boolean pause) {

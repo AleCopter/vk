@@ -38,7 +38,7 @@ public class TitleBar extends JPanel {
         createNewTab("music.png", new AudioTab());
         createNewTab("options.png", new OptionsTab());
 
-        this.add(Box.createRigidArea(new Dimension(500, 0)));
+        this.add(Box.createRigidArea(new Dimension(430, 0)));
 
         this.add(new TopAudioPanel());
 
@@ -50,9 +50,10 @@ public class TitleBar extends JPanel {
 
         JButton exitButton = new JButton(getIcon("icons/close2.png", BUTTON_SIZE));
         exitButton.setFocusable(false);
+        exitButton.setAlignmentX(RIGHT_ALIGNMENT);
         exitButton.setSize(new Dimension(20, 20));
         exitButton.addActionListener(e -> exit());
-        this.add(exitButton, RIGHT_ALIGNMENT);
+        this.add(exitButton);
     }
 
     static ImageIcon getIcon(String path, int size) {
