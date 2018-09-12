@@ -1,6 +1,7 @@
 package com.aemmie.vk.app;
 
 import com.aemmie.vk.basic.SmoothMouseWheel;
+import com.aemmie.vk.basic.VideoPlayer;
 import com.aemmie.vk.core.Tab;
 
 import javax.swing.*;
@@ -24,7 +25,8 @@ public class MessagesTab extends Tab {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(null);
 
-        panel.add(new TODO());
+        //panel.add(new TODO());
+        panel.add(new VideoPlayer());
     }
 
     @Override

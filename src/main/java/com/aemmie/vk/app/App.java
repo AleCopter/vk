@@ -9,6 +9,7 @@ import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
@@ -71,7 +72,7 @@ public class App {
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(App::exit));
         Auth.init();
-        //vlcInit();
+        vlcInit();
         SwingUtilities.invokeLater(() -> {
             initialize();
             frame.setVisible(true);
@@ -81,7 +82,7 @@ public class App {
 
 
     static void exit() {
-        //vlcExit();
+        vlcExit();
         Player.options.save();
         Runtime.getRuntime().halt(0);
     }
@@ -99,6 +100,7 @@ public class App {
             }
             WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\VideoLAN\\VLC", "InstallDir", System.getProperty("user.dir") + "\\lib\\VLC");
             new NativeDiscovery().discover();
+            LibC.INSTANCE._putenv("VLC_PLUGIN_PATH=" + System.getProperty("user.dir") + "\\lib\\VLC");
         } catch (Exception e) {
             LOGGER.error("VLC INIT ERROR", e);
         }
