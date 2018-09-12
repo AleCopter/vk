@@ -1,5 +1,6 @@
 package com.aemmie.vk.app;
 
+import com.aemmie.vk.basic.SmoothMouseWheel;
 import com.aemmie.vk.core.Tab;
 import com.aemmie.vk.news.NewsApi;
 
@@ -22,7 +23,8 @@ public class NewsTab extends Tab {
         panel.setBorder(null);
 
         scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(App.options.SCROLL_RATE);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(0);
+        scrollPane.addMouseWheelListener(new SmoothMouseWheel(scrollPane));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> {
             JScrollBar bar = (JScrollBar) e.getSource();
