@@ -3,6 +3,7 @@ package com.aemmie.vk.news.classes;
 import com.aemmie.vk.app.App;
 import com.aemmie.vk.basic.Doc;
 import com.aemmie.vk.basic.PhotoSize;
+import com.aemmie.vk.news.NewsApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,11 +231,11 @@ public class NewsBox extends JPanel {
     }
 
     private static void setImage(JLabel image, String src) {
-        new Thread(() -> {
+        NewsApi.executor.submit(() -> {
             try {
                 image.setIcon(getScaledImage(src));
             } catch (IOException ignored) { }
-        }).start();
+        });
     }
 
     private static void setImage(JLabel image, BufferedImage src) {

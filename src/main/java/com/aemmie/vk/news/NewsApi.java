@@ -17,6 +17,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class NewsApi {
     private static Logger LOGGER = LoggerFactory.getLogger(NewsApi.class);
@@ -31,6 +33,8 @@ public class NewsApi {
     private static int last = 0;
 
     private static JPanel panel;
+
+    public static ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public static void updateNews(int count) {
         ready = false;
