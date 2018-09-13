@@ -1,6 +1,6 @@
 package com.aemmie.vk.news;
 
-import com.aemmie.vk.basic.Group;
+import com.aemmie.vk.data.Group;
 import com.aemmie.vk.core.VKApiRequest;
 import com.aemmie.vk.news.classes.NewsBox;
 import com.aemmie.vk.news.classes.Post;

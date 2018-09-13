@@ -1,6 +1,5 @@
 package com.aemmie.vk.core;
 
-import com.aemmie.vk.auth.Auth;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

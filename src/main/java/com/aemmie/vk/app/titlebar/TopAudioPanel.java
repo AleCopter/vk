@@ -1,4 +1,4 @@
-package com.aemmie.vk.app;
+package com.aemmie.vk.app.titlebar;
 
 import com.aemmie.vk.music.Player;
 
@@ -16,8 +16,6 @@ public class TopAudioPanel extends JPanel {
 
     private static final int MEDIA_BUTTON_SIZE = 22;
     private static final int MUSIC_TITLE_CHAR_LIMIT = 60;
-
-    private static final Dimension DEFAULT_HORIZONTAL_DIM = new Dimension(20, 0);
 
     private static final ImageIcon PLAY_ICON = TitleBar.getIcon("icons/play.png", MEDIA_BUTTON_SIZE);
     private static final ImageIcon PAUSE_ICON = TitleBar.getIcon("icons/pause.png", MEDIA_BUTTON_SIZE);
@@ -185,11 +183,11 @@ public class TopAudioPanel extends JPanel {
         else musicTitle.setText(title);
     }
 
-    static void audioPrev() { Player.prev(); }
+    public static void audioPrev() { Player.prev(); }
 
-    static void audioNext() { Player.next(); }
+    public static void audioNext() { Player.next(); }
 
-    static void audioPlayPause() {
+    public static void audioPlayPause() {
         if (playButton.getIcon().equals(PLAY_ICON)) {
             Player.play();
         } else {

@@ -1,8 +1,8 @@
 package com.aemmie.vk.news.classes;
 
 import com.aemmie.vk.app.App;
-import com.aemmie.vk.basic.Doc;
-import com.aemmie.vk.basic.PhotoSize;
+import com.aemmie.vk.data.Doc;
+import com.aemmie.vk.data.PhotoSize;
 import com.aemmie.vk.news.NewsApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

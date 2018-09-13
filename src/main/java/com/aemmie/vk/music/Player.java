@@ -1,7 +1,7 @@
 package com.aemmie.vk.music;
 
-import com.aemmie.vk.auth.Auth;
-import com.aemmie.vk.basic.Audio;
+import com.aemmie.vk.core.Auth;
+import com.aemmie.vk.data.Audio;
 import com.aemmie.vk.options.AudioOptions;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
@@ -16,8 +16,8 @@ import java.util.*;
 import java.util.List;
 import java.util.Timer;
 
-import static com.aemmie.vk.app.TopAudioPanel.setMusicTitle;
-import static com.aemmie.vk.app.TopAudioPanel.setPlayIcon;
+import static com.aemmie.vk.app.titlebar.TopAudioPanel.setMusicTitle;
+import static com.aemmie.vk.app.titlebar.TopAudioPanel.setPlayIcon;
 
 public class Player {
     private static final JFXPanel fxPanel = new JFXPanel(); //init javafx

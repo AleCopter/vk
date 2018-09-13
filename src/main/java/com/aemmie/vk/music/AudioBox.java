@@ -1,6 +1,6 @@
 package com.aemmie.vk.music;
 
-import com.aemmie.vk.basic.Audio;
+import com.aemmie.vk.data.Audio;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

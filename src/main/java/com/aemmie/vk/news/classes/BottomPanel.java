@@ -1,7 +1,7 @@
 package com.aemmie.vk.news.classes;
 
 import com.aemmie.vk.app.App;
-import com.aemmie.vk.basic.Group;
+import com.aemmie.vk.data.Group;
 import com.aemmie.vk.news.NewsApi;
 
 import javax.swing.*;

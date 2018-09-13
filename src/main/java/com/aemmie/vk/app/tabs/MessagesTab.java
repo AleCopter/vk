@@ -1,21 +1,18 @@
-package com.aemmie.vk.app;
+package com.aemmie.vk.app.tabs;
 
 import com.aemmie.vk.basic.SmoothMouseWheel;
-import com.aemmie.vk.core.Tab;
-import com.aemmie.vk.music.Player;
+import com.aemmie.vk.basic.VideoPlayer;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class AudioTab extends Tab {
+public class MessagesTab extends Tab {
     public JPanel panel = new JPanel();
     private JScrollPane scrollPane = new JScrollPane(panel);
 
-    private JPanel topPanel = new JPanel();
+    VideoPlayer tuturu = new VideoPlayer();
 
-    private Dimension buttonsSize = new Dimension(30, 40);
-
-    public AudioTab() {
+    public MessagesTab() {
         panel.setBackground(Color.DARK_GRAY);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(null);
@@ -29,9 +26,9 @@ public class AudioTab extends Tab {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(null);
 
-        Player.setAudioPanel(panel);
+        //panel.add(new TODO());
+        panel.add(tuturu);
     }
-
 
     @Override
     public void init() {
@@ -40,7 +37,7 @@ public class AudioTab extends Tab {
 
     @Override
     public void onUpdate() {
-
+        tuturu.update();
     }
 
     @Override

@@ -1,19 +1,23 @@
 package com.aemmie.vk.app;
 
-import com.aemmie.vk.auth.Auth;
+import com.aemmie.vk.app.tabs.Tab;
+import com.aemmie.vk.app.titlebar.TitleBar;
+import com.aemmie.vk.core.Auth;
+import com.aemmie.vk.core.Global;
+import com.aemmie.vk.core.KeyboardHotkeys;
 import com.aemmie.vk.music.Player;
 import com.aemmie.vk.options.AppOptions;
 import com.cactiCouncil.IntelliJDroplet.WinRegistry;
-import lc.kra.system.keyboard.GlobalKeyboardHook;
-import lc.kra.system.keyboard.event.GlobalKeyAdapter;
-import lc.kra.system.keyboard.event.GlobalKeyEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
 
 public class App {
     private static Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -21,36 +25,22 @@ public class App {
 
     public static AppOptions options = AppOptions.load();
 
-    static JPanel mainPanel = new JPanel();
+    private static JPanel mainPanel = new JPanel();
 
     private static void initialize() {
-        frameInit();
-
-        new Thread(Player::init).start();
-
-        GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(false);
-        keyboardHook.addKeyListener(new GlobalKeyAdapter() {
-            @Override
-            public void keyReleased(GlobalKeyEvent event) {
-                switch (event.getVirtualKeyCode()) {
-                    case 176: //media_next
-                        TopAudioPanel.audioNext();
-                        break;
-                    case 177: //media_prev
-                        TopAudioPanel.audioPrev();
-                        break;
-                    case 179: //media_play
-                        TopAudioPanel.audioPlayPause();
-                        break;
-                }
-            }
-        });
-
-    }
-
-    private static void frameInit() {
         frame = new JFrame();
-        frame.add(mainPanel);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        try {
+            Global.background = ImageIO.read(new URL("https://images.wallpaperscraft.ru/image/zvezdy_kosmos_siyanie_planeta_99744_1920x1080.jpg"))
+                    .getScaledInstance(screenSize.width, screenSize.height, Image.SCALE_SMOOTH);
+        } catch (IOException ignored) { }
+        screenSize.height -= Toolkit.getDefaultToolkit().getScreenInsets(frame.getGraphicsConfiguration()).bottom;
+        screenSize.width++;
+        Global.screenSize = screenSize;
+        frame.setSize(screenSize);
+
+
+        frame.setContentPane(mainPanel);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         mainPanel.add(new TitleBar());
@@ -61,13 +51,10 @@ public class App {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("VK client");
         frame.setUndecorated(true);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        screenSize.height -= Toolkit.getDefaultToolkit().getScreenInsets(frame.getGraphicsConfiguration()).bottom;
 
-        screenSize.width++;
-        frame.setSize(screenSize);
+        KeyboardHotkeys.init();
+        new Thread(Player::init).start();
     }
-
 
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(App::exit));
@@ -79,9 +66,13 @@ public class App {
         });
     }
 
+    public static void setMainPanel(Tab tab) {
+        mainPanel.remove(1);
+        mainPanel.add(tab);
+        mainPanel.updateUI();
+    }
 
-
-    static void exit() {
+    private static void exit() {
         vlcExit();
         Player.options.save();
         Runtime.getRuntime().halt(0);

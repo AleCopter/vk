@@ -1,4 +1,4 @@
-package com.aemmie.vk.basic;
+package com.aemmie.vk.data;
 
 import com.google.gson.JsonObject;
 

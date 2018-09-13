@@ -1,6 +1,6 @@
 package com.aemmie.vk.music;
 
-import com.aemmie.vk.basic.Audio;
+import com.aemmie.vk.data.Audio;
 import com.aemmie.vk.core.VKApiRequest;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;

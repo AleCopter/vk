@@ -1,7 +1,8 @@
-package com.aemmie.vk.app;
+package com.aemmie.vk.app.tabs;
 
+import com.aemmie.vk.app.App;
 import com.aemmie.vk.basic.SmoothMouseWheel;
-import com.aemmie.vk.core.Tab;
+import com.aemmie.vk.core.Global;
 import com.aemmie.vk.options.AppOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ public class OptionsTab extends Tab {
     private static Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     private JPanel panel = new JPanel();
-    private JScrollPane scrollPane = new JScrollPane(panel);
+    private JScrollPane scrollPane;
 
     private JPanel topPanel = new JPanel();
 
@@ -27,14 +28,22 @@ public class OptionsTab extends Tab {
     public OptionsTab() {
         reloadOptions();
 
-        panel.setBackground(Color.DARK_GRAY);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(null);
+        panel.setOpaque(false);
 
+        scrollPane = new JScrollPane(panel) {
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(Global.background, 0, 0, this);
+            }
+        };
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(0);
         scrollPane.addMouseWheelListener(new SmoothMouseWheel(scrollPane));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getViewport().setOpaque(false);
 
         this.add(scrollPane);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

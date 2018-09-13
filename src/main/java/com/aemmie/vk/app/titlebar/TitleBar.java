@@ -1,13 +1,17 @@
-package com.aemmie.vk.app;
+package com.aemmie.vk.app.titlebar;
 
-import com.aemmie.vk.core.Tab;
+import com.aemmie.vk.app.App;
+import com.aemmie.vk.app.tabs.AudioTab;
+import com.aemmie.vk.app.tabs.MessagesTab;
+import com.aemmie.vk.app.tabs.NewsTab;
+import com.aemmie.vk.app.tabs.OptionsTab;
+import com.aemmie.vk.app.tabs.Tab;
+import com.aemmie.vk.core.Global;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.util.ArrayList;
-
-import static com.aemmie.vk.app.App.exit;
 
 public class TitleBar extends JPanel {
     private static JPanel titlebar; //this
@@ -18,15 +22,10 @@ public class TitleBar extends JPanel {
     private static int titlebar_instrument_id;
 
     private static final int BUTTON_SIZE = 40;
-    private static final int MEDIA_BUTTON_SIZE = 25;
-    private static final int MUSIC_TITLE_CHAR_LIMIT = 60;
 
     private static final Dimension DEFAULT_HORIZONTAL_DIM = new Dimension(20, 0);
 
-    private static final ImageIcon PLAY_ICON = getIcon("icons/play.png", MEDIA_BUTTON_SIZE);
-    private static final ImageIcon PAUSE_ICON = getIcon("icons/pause.png", MEDIA_BUTTON_SIZE);
-
-    TitleBar() {
+    public TitleBar() {
         titlebar = this;
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setMaximumSize(new Dimension(10000, 40));
@@ -38,7 +37,7 @@ public class TitleBar extends JPanel {
         createNewTab("music.png", new AudioTab());
         createNewTab("options.png", new OptionsTab());
 
-        this.add(Box.createRigidArea(new Dimension(370, 0)));
+        this.add(Box.createRigidArea(new Dimension((int)(0.15 * Global.screenSize.width), 0)));
 
         this.add(new TopAudioPanel());
 
@@ -52,7 +51,7 @@ public class TitleBar extends JPanel {
         exitButton.setFocusable(false);
         exitButton.setAlignmentX(RIGHT_ALIGNMENT);
         exitButton.setSize(new Dimension(20, 20));
-        exitButton.addActionListener(e -> exit());
+        exitButton.addActionListener(e -> System.exit(0));
         this.add(exitButton);
     }
 
@@ -73,19 +72,17 @@ public class TitleBar extends JPanel {
         tabsList.add(tab);
     }
 
-    static void setTab(int tab) {
+    public static void setTab(int tab) {
         setTab(tabButtonsList.get(tab));
     }
 
     private static void setTab(JToggleButton tabButton) {
-        App.mainPanel.remove(1);
-        Tab tabFromList = tabsList.get(tabButtonsList.indexOf(tabButton));
-        App.mainPanel.add(tabFromList);
-        App.mainPanel.updateUI();
-        tabFromList.onUpdate();
+        Tab tab = tabsList.get(tabButtonsList.indexOf(tabButton));
+        App.setMainPanel(tab);
+        tab.onUpdate();
 
 
-        JComponent top = tabFromList.getTopPanel();
+        JComponent top = tab.getTopPanel();
         titlebar.remove(titlebar_instrument_id);
         if (top != null) {
             titlebar.add(top, titlebar_instrument_id);

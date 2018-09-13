@@ -1,7 +1,7 @@
-package com.aemmie.vk.app;
+package com.aemmie.vk.app.tabs;
 
 import com.aemmie.vk.basic.SmoothMouseWheel;
-import com.aemmie.vk.core.Tab;
+import com.aemmie.vk.core.Global;
 import com.aemmie.vk.news.NewsApi;
 
 import javax.swing.*;
@@ -11,7 +11,7 @@ import java.awt.*;
 public class NewsTab extends Tab {
 
     private JPanel panel = new JPanel();
-    private JScrollPane scrollPane = new JScrollPane(panel);
+    private JScrollPane scrollPane;
 
     private JPanel topPanel = new JPanel();
 
@@ -21,7 +21,16 @@ public class NewsTab extends Tab {
         panel.setBackground(Color.DARK_GRAY);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(null);
+        panel.setOpaque(false);
 
+
+        scrollPane = new JScrollPane(panel) {
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                g.drawImage(Global.background, 0, 0, this);
+            }
+        };
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(0);
         scrollPane.addMouseWheelListener(new SmoothMouseWheel(scrollPane));
@@ -32,6 +41,7 @@ public class NewsTab extends Tab {
                 NewsApi.updateNews(5);
             }
         });
+        scrollPane.getViewport().setOpaque(false);
 
         this.add(scrollPane);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

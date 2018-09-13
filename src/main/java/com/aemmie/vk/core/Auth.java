@@ -1,6 +1,4 @@
-package com.aemmie.vk.auth;
-
-import com.aemmie.vk.core.VKApiRequest;
+package com.aemmie.vk.core;
 
 import javax.swing.*;
 import java.io.BufferedReader;

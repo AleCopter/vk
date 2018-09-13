@@ -1,4 +1,4 @@
-package com.aemmie.vk.core;
+package com.aemmie.vk.app.tabs;
 
 import javax.swing.*;
 

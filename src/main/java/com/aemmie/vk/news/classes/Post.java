@@ -1,9 +1,9 @@
 package com.aemmie.vk.news.classes;
 
-import com.aemmie.vk.basic.Audio;
-import com.aemmie.vk.basic.Doc;
-import com.aemmie.vk.basic.Photo;
-import com.aemmie.vk.basic.PhotoSize;
+import com.aemmie.vk.data.Audio;
+import com.aemmie.vk.data.Doc;
+import com.aemmie.vk.data.Photo;
+import com.aemmie.vk.data.PhotoSize;
 import com.aemmie.vk.core.VKApiRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
