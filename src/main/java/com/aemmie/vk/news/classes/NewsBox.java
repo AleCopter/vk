@@ -46,7 +46,8 @@ public class NewsBox extends JPanel {
 
         try {
             box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
-            box.setBackground(Color.WHITE);
+            box.setBackground(new Color(0, 0, 0, 0));
+            box.setOpaque(false);
             box.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
 
             JPanel mainPanel = new JPanel();
@@ -55,6 +56,7 @@ public class NewsBox extends JPanel {
             mainPanel.setBackground(Color.WHITE);
             box.setBackground(Color.DARK_GRAY);
 
+            //region
             if (post.text != null && !post.text.equals("")) {
                 mainPanel.add(new PostText(post));
                 mainPanel.add(Box.createRigidArea(new Dimension(App.options.NEWS_WIDTH, 5)));
@@ -85,6 +87,7 @@ public class NewsBox extends JPanel {
                         }
                         button.addActionListener(new ActionListener() { //region
                             boolean preload = App.options.PRELOAD_MULTI_PHOTO;
+
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 int a = Integer.parseInt(button.getText()) - 1;
@@ -101,6 +104,7 @@ public class NewsBox extends JPanel {
 
                     label.addMouseListener(new MouseAdapter() { //region
                         boolean preload = App.options.PRELOAD_MULTI_PHOTO;
+
                         @Override
                         public void mouseReleased(MouseEvent e) {
                             active[0] += e.getX() > label.getIcon().getIconWidth() / 2 ? +1 : -1;
@@ -182,7 +186,7 @@ public class NewsBox extends JPanel {
             }
 
             //TODO: video, audio & other types
-
+            //endregion
 
             mainPanel.add(Box.createRigidArea(defaultSpace));
             mainPanel.add(new BottomPanel(post)); //group, likes & views
@@ -207,10 +211,10 @@ public class NewsBox extends JPanel {
         if (App.options.NEWS_LIKE_FILTER) {
             if ((post.views != null) && (
                     ((post.likes.count < 3) && (post.views.count > 80))
-                    ||
-                    ((post.likes.count < 10) && (post.views.count > 500))
-                    ||
-                    ((Instant.now().getEpochSecond() - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80))))
+                            ||
+                            ((post.likes.count < 10) && (post.views.count > 500))
+                            ||
+                            ((Instant.now().getEpochSecond() - post.date > 720) && (post.views.count / (post.likes.count + 1) > 80))))
                 return true;
         }
 
@@ -234,7 +238,8 @@ public class NewsBox extends JPanel {
         NewsApi.executor.submit(() -> {
             try {
                 image.setIcon(getScaledImage(src));
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+            }
         });
     }
 
@@ -246,7 +251,8 @@ public class NewsBox extends JPanel {
         new Thread(() -> {
             try {
                 image.setIcon(getGif(src, width, height));
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+            }
         }).start();
     }
 
