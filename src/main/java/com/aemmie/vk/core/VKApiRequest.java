@@ -1,7 +1,9 @@
 package com.aemmie.vk.core;
 
+import com.aemmie.vk.app.App;
 import com.aemmie.vk.data.Error;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpResponse;
@@ -14,8 +16,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -67,11 +71,11 @@ public class VKApiRequest {
             }
 
             String url = "https://" + API_URL + params.get("method");
-            if (!params.containsKey("access_token")) params.put("access_token", Auth.getAccessToken());
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost request = new HttpPost(url);
             request.addHeader("User-Agent", "KateMobileAndroid/48.2 lite-433 (Android 8.1.0; SDK 27; arm64-v8a; Google Pixel 2 XL; en)");
             List<NameValuePair> urlParameters = new ArrayList<>();
+            if (!params.containsKey("access_token")) urlParameters.add(new BasicNameValuePair("access_token", Auth.getAccessToken()));
             for (String key : params.keySet()) {
                 if (!key.equals("method")) urlParameters.add(new BasicNameValuePair(key, params.get(key)));
             }
@@ -81,17 +85,36 @@ public class VKApiRequest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
             JsonObject rootObj = parser.parse(reader.readLine()).getAsJsonObject();
             if (rootObj.has("error")) {
-                LOGGER.error(rootObj.toString());
+                //LOGGER.error(rootObj.toString());
+                System.out.println(rootObj.getAsJsonObject("error").get("error_code"));
                 Error error = gson.fromJson(rootObj.get("error"), Error.class);
+                LOGGER.info(String.valueOf(error.error_code == 14));
                 switch (error.error_code) {
                     case 5:
                         Auth.init(true);
-                        break;
+                        return this.run();
+
+                    case 14:
+                        JPanel panel = new JPanel();
+                        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                        JTextField key = new JTextField();
+                        panel.add(new JLabel(new ImageIcon(new URL(error.captcha_img))));
+                        panel.add(key);
+                        LOGGER.info("QQQQQ");
+                        JOptionPane.showConfirmDialog(App.frame, panel, "Authentication", JOptionPane.OK_CANCEL_OPTION);
+                        this.param("captcha_sid", error.captcha_sid);
+                        this.param("captcha_key", key.getText());
+                        return this.run();
                 }
-                return null;
+
             }
-            return rootObj.getAsJsonObject("response");
+            JsonElement element = rootObj.get("response");
+            if (element.isJsonObject()) {
+                return rootObj.getAsJsonObject("response");
+            }
+            else return null;
         } catch (Exception e) {
+            LOGGER.error("EXCEPTION", e);
             return null;
         }
     }

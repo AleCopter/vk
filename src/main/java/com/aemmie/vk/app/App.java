@@ -21,7 +21,7 @@ import java.net.URL;
 
 public class App {
     private static Logger LOGGER = LoggerFactory.getLogger(App.class);
-    private static JFrame frame;
+    public static JFrame frame;
 
     public static AppOptions options = AppOptions.load();
 
@@ -54,6 +54,9 @@ public class App {
 
         KeyboardHotkeys.init();
         new Thread(Player::init).start();
+
+//        for (int i = 0; i < 10; i++)
+//        new VKApiRequest("messages.send").param("user_id", Auth.getMyId()).param("message", "123").run();
     }
 
     public static void main(String[] args) {
