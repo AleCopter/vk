@@ -1,9 +1,5 @@
-package com.aemmie.vk.news.classes;
+package com.aemmie.vk.data;
 
-import com.aemmie.vk.data.Audio;
-import com.aemmie.vk.data.Doc;
-import com.aemmie.vk.data.Photo;
-import com.aemmie.vk.data.PhotoSize;
 import com.aemmie.vk.core.VKApiRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -26,19 +22,19 @@ public class Post {
     }.getType();
 
     public String type;
-    Integer source_id;
-    Integer date;
-    String post_type;
-    String text;
-    Integer marked_as_ads;
-    JsonArray attachments;
-    Likes likes;
-    Views views;
+    public Integer source_id;
+    public Integer date;
+    public String post_type;
+    public String text;
+    public Integer marked_as_ads;
+    public JsonArray attachments;
+    public Likes likes;
+    public Views views;
 
-    transient List<Photo> photoList;
-    transient List<Audio> audioList;
-    transient List<Video> videoList; //TODO: add video class
-    transient List<Doc> docList;   //TODO: add other doc types (now only GIF)
+    public transient List<Photo> photoList;
+    public transient List<Audio> audioList;
+    public transient List<Video> videoList; //TODO: add video class
+    public transient List<Doc> docList;   //TODO: add other doc types (now only GIF)
 
     public void parse() {
         if (attachments != null) {
@@ -74,10 +70,3 @@ public class Post {
     }
 }
 
-class Likes {
-    public Integer count;
-}
-
-class Views {
-    public Integer count;
-}

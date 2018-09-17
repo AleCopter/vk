@@ -2,8 +2,7 @@ package com.aemmie.vk.news;
 
 import com.aemmie.vk.data.Group;
 import com.aemmie.vk.core.VKApiRequest;
-import com.aemmie.vk.news.classes.NewsBox;
-import com.aemmie.vk.news.classes.Post;
+import com.aemmie.vk.data.Post;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
