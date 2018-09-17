@@ -15,7 +15,11 @@ public class Auth {
     private static String ID;
 
     public static void init() {
-        if (!TOKEN.exists()) {
+        init(false);
+    }
+
+    public static void init(boolean force) {
+        if (force || !TOKEN.exists()) {
             updateToken();
         }
         readTokenFromFile();
@@ -37,7 +41,7 @@ public class Auth {
         return ID;
     }
 
-    public static void updateToken() {
+    private static void updateToken() {
 //        if (TOKEN.exists()) {
 //            TOKEN.delete();
 //        }

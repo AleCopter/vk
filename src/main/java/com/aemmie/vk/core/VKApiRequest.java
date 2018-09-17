@@ -1,5 +1,6 @@
 package com.aemmie.vk.core;
 
+import com.aemmie.vk.data.Error;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -21,15 +22,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class VKApiRequest {
-
-    private static final String API_URL = "api.vk.com/method/";
-
-    private static int requestsPerLastSecond = 0;
+    private static Logger LOGGER = LoggerFactory.getLogger(VKApiRequest.class);
+    private static JsonParser parser = new JsonParser();
 
     public static Gson gson = new Gson();
 
-    private static Logger LOGGER = LoggerFactory.getLogger(VKApiRequest.class);
-    private static JsonParser parser = new JsonParser();
+    private static final String API_URL = "api.vk.com/method/";
+    private static int requestsPerLastSecond = 0;
 
     public LinkedHashMap<String, String> params = new LinkedHashMap<>();
 
@@ -81,6 +80,16 @@ public class VKApiRequest {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
             JsonObject rootObj = parser.parse(reader.readLine()).getAsJsonObject();
+            if (rootObj.has("error")) {
+                LOGGER.error(rootObj.toString());
+                Error error = gson.fromJson(rootObj.get("error"), Error.class);
+                switch (error.error_code) {
+                    case 5:
+                        Auth.init(true);
+                        break;
+                }
+                return null;
+            }
             return rootObj.getAsJsonObject("response");
         } catch (Exception e) {
             return null;
