@@ -1,5 +1,7 @@
 package com.aemmie.vk.app.titlebar;
 
+import com.aemmie.vk.NewClasses.AudioProgress;
+import com.aemmie.vk.NewClasses.NewSliders;
 import com.aemmie.vk.music.Player;
 
 import javax.swing.*;
@@ -11,6 +13,7 @@ public class TopAudioPanel extends JPanel {
 
     private static JButton playButton;
     private static JLabel musicTitle;
+    private static AudioProgress ap;
 
     private static JSlider progressBar;
 
@@ -23,12 +26,14 @@ public class TopAudioPanel extends JPanel {
     TopAudioPanel() {
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        Color col = new Color(61,151,195);
 
         JToggleButton randomButton = new JToggleButton(TitleBar.getIcon("icons/replay.png", 15));
         randomButton.setMargin(new Insets(1, 1, 1, 1));
         randomButton.setFocusable(false);
         randomButton.setSelected(Player.options.REPLAY);
         randomButton.addActionListener(e -> Player.toggleReplay());
+        randomButton.setBackground(col);
         leftPanel.add(randomButton);
 
         JToggleButton shuffleButton = new JToggleButton(TitleBar.getIcon("icons/shuffle.png", 15));
@@ -36,16 +41,26 @@ public class TopAudioPanel extends JPanel {
         shuffleButton.setFocusable(false);
         shuffleButton.setSelected(Player.options.RANDOM);
         shuffleButton.addActionListener(e -> Player.toggleRandom());
+        shuffleButton.setBackground(col);
         leftPanel.add(shuffleButton);
 
 
         JPanel midTopPanel = new JPanel();
         midTopPanel.setLayout(new BoxLayout(midTopPanel, BoxLayout.X_AXIS));
 
+        midTopPanel.setBackground(col);
+        midTopPanel.setIgnoreRepaint(true);
+        this.setBackground(col);
+
         JSlider volume = new JSlider(SwingConstants.HORIZONTAL, 8, 100, Player.options.AUDIO_VOLUME);
+
+        volume.setBackground(col);
+        volume.setUI(new NewSliders(volume));
+        volume.setFocusable(false);
+
         volume.addChangeListener(e -> {
             JSlider source = (JSlider)e.getSource();
-            Player.updateVolume(source.getValue());
+            //layer.updateVolume(source.getValue());
         });
         volume.addMouseListener(new MouseAdapter() {
             @Override
@@ -57,7 +72,7 @@ public class TopAudioPanel extends JPanel {
                 double newVal = range * percent;
                 int result = (int)(source.getMinimum() + newVal);
                 source.setValue(result);
-                Player.updateVolume(result);
+                //Player.updateVolume(result);
             }
         });
         volume.setMaximumSize(new Dimension(160, 20));
@@ -150,17 +165,17 @@ public class TopAudioPanel extends JPanel {
         layout.setConstraints(midTopPanel, c);
         this.add(midTopPanel);
 
-        c.gridx = 2; c.gridy = 1;
-        layout.setConstraints(musicTitle, c);
-        this.add(musicTitle);
+        //c.gridx = 2; c.gridy = 1;
+        //layout.setConstraints(musicTitle, c);
+        //this.add(musicTitle);
 
         c.gridx = 1; c.gridy = 2;
         layout.setConstraints(volume, c);
         this.add(volume);
 
-        c.gridx = 2; c.gridy = 2; c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 2; c.gridy = 1; c.gridheight = 2; c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 400;
         layout.setConstraints(progressBar, c);
-        c.fill = 0;
         this.add(progressBar);
 
 
@@ -178,9 +193,11 @@ public class TopAudioPanel extends JPanel {
     }
 
     public static void setMusicTitle(String title) {
-        if (title.length() > MUSIC_TITLE_CHAR_LIMIT)
+       /* if (title.length() > MUSIC_TITLE_CHAR_LIMIT)
             musicTitle.setText(title.substring(0, MUSIC_TITLE_CHAR_LIMIT) + "...");
         else musicTitle.setText(title);
+        */
+        ap.text = title;
     }
 
     public static void audioPrev() { Player.prev(); }
