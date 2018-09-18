@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="libbluray-j2se-1.0.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/VLC/plugins/access/libbluray-j2se-1.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
